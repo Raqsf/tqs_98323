@@ -3,16 +3,16 @@ package com.mystack;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
-public class Stack<T> {
+public class TqsStack<T> {
     private LinkedList<T> stack;
     private int bound;
 
-    public Stack() {
+    public TqsStack() {
         this.stack = new LinkedList<T>();
         this.bound = -1;
     }
 
-    public Stack(int bound) {
+    public TqsStack(int bound) {
         this.stack = new LinkedList<T>();
         this.bound = bound;
     }

@@ -10,11 +10,11 @@ import org.junit.jupiter.api.DisplayName;
 
 public class StackTest {
 
-    Stack<Integer> stack;
+    TqsStack<Integer> stack;
 
     @BeforeEach
     public void initEach(){
-        stack = new Stack<>();
+        stack = new TqsStack<>();
     }
 
     @Test
@@ -83,7 +83,7 @@ public class StackTest {
     @Test
     @DisplayName("For bounded stacks only: pushing onto a full stack does throw an IllegalStateException")
     void pushBoundedStack() {
-        Stack<Integer> s = new Stack<>(3);
+        TqsStack<Integer> s = new TqsStack<>(3);
 
         for(int i = 0; i < 3; i++) {
             s.push(i);
