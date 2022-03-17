@@ -1,6 +1,6 @@
 package ua.stock;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+//import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,6 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 @ExtendWith(MockitoExtension.class)
 public class StocksPortfolioTest {
@@ -39,7 +42,8 @@ public class StocksPortfolioTest {
         portfolio.addStock(new Stock("V", 1));
         double result = portfolio.getTotalValue();
 
-        assertEquals(22.55, result);
+        // assertEquals(22.55, result);
+        assertThat(result, is(22.55));
         verify( stockmarket, times(2)).lookUpPrice(anyString());
     }
 }
