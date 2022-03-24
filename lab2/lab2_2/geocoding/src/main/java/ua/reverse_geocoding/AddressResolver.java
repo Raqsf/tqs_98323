@@ -6,8 +6,6 @@ import java.text.ParseException;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.json.simple.JSONArray;
@@ -36,7 +34,6 @@ public class AddressResolver {
 
 
         String apiResponse = this.httpClient.doHttpGet(uriBuilder.build().toString());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, apiResponse);
 
         // get parts from response till reaching the address
         JSONObject obj = (JSONObject) new JSONParser().parse(apiResponse);
