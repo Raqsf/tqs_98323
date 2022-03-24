@@ -1,4 +1,4 @@
-package ua.reverse_geocoding;
+package ua.reverse_geocoding.lab2_2;
 
 import static org.mockito.ArgumentMatchers.contains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +18,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import ua.reverse_geocoding.Address;
+import ua.reverse_geocoding.AddressResolver;
+import ua.reverse_geocoding.connection.ISimpleHttpClient;
 import ua.reverse_geocoding.connection.TqsBasicHttpClient;
 
 /**
@@ -27,7 +30,7 @@ import ua.reverse_geocoding.connection.TqsBasicHttpClient;
 public class GeocodingTest {
 
     @Mock
-    private TqsBasicHttpClient httpClient;
+    private ISimpleHttpClient httpClient;
 
     @InjectMocks
     private AddressResolver addressResolver;
