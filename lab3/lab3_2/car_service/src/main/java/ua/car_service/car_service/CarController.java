@@ -3,6 +3,7 @@ package ua.car_service.car_service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 /**
  * CarController
  */
@@ -15,27 +16,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class CarController {
 
-    // @AutoWired
-    private final CarManagerService carManagerservice;
-
-    public CarController(CarManagerService carManagerservice) {
-        this.carManagerservice = carManagerservice;
-    }
+    @Autowired
+    private CarManagerService carManagerservice;
 
     @PostMapping("/car")
     public ResponseEntity<Car> createCar(@RequestBody Car car) {
-        /* HttpStatus status = HttpStatus.CREATED;
-        Car saved =  */
-        return null;
+        HttpStatus status = HttpStatus.CREATED;
+        Car saved = carManagerservice.save(car);
+        return new ResponseEntity<>(saved, status);
     }
 
     @GetMapping("/cars")
     public List<Car> getAllCars() {
-        return new ArrayList<Car>();
+        return carManagerservice.getAllCars();
     }
 
-    @GetMapping("/car")
-    public ResponseEntity<Car> getCarById(long id) {
-        return null;
+    @GetMapping("/{id}")
+    public ResponseEntity<Car> getCarById(@PathVariable(value="id") Long id) {
+        return ResponseEntity.ok().body(carManagerservice.getCarDetails(id).get());
     }
 }
