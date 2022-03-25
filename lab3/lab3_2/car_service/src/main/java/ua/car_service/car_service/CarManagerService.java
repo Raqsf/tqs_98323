@@ -2,7 +2,6 @@ package ua.car_service.car_service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
 
 // import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,15 +18,15 @@ public class CarManagerService {
     }
 
     public Car save(Car carEntity) {
-        return null;
+        return carRepository.save(carEntity);
     }
 
     public List<Car> getAllCars() {
-        return null;
+        return carRepository.findAll();
     }
 
     public Optional<Car> getCarDetails(Long id) {
-        return null;
+        return carRepository.findById(id);
     }
 
     

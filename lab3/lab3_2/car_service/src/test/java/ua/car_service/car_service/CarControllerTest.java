@@ -29,6 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(CarController.class)
 public class CarControllerTest {
 
+    private Car car;
+
     @Autowired
     private MockMvc mvc;
 
@@ -37,11 +39,11 @@ public class CarControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
+        car = new Car("Nissan", "180Sx");
     }
 
     @Test
     public void whenPostCar_thenCreateCar() throws IOException, Exception {
-        Car car = new Car("Nissan", "180Sx");
         
         when(service.save(Mockito.any())).thenReturn(car);
 
@@ -78,21 +80,15 @@ public class CarControllerTest {
 
     @Test
     public void whenGetACar_thenReturnJson() throws Exception {
-        Car c1 = new Car("Ford", "Mustang");
-        // Dodge  
-            // LCAT charger
-        // Ford
-            // raptor
-
         Long id = 1L;
 
-        when(service.getCarDetails(id)).thenReturn(Optional.of(c1));
+        when(service.getCarDetails(id)).thenReturn(Optional.of(car));
         
         mvc.perform(
             get("/api/{id}", id).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.model", is(c1.getModel())))
-            .andExpect(jsonPath("$.maker", is(c1.getMaker())));
+            .andExpect(jsonPath("$.model", is(car.getModel())))
+            .andExpect(jsonPath("$.maker", is(car.getMaker())));
 
         verify(service, times(1)).getCarDetails(id);
     }
