@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import ua.reverse_geocoding.Address;
 import ua.reverse_geocoding.AddressResolver;

@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.reverse_geocoding.Address;
 import ua.reverse_geocoding.AddressResolver;
 import ua.reverse_geocoding.connection.ISimpleHttpClient;
-import ua.reverse_geocoding.connection.TqsBasicHttpClient;
 
 /**
  * GeocodingTest
