@@ -26,9 +26,7 @@ public class CarRepositoryTest {
     @BeforeEach
     public void setUp() throws Exception {
         car = new Car("Nissan", "Skyline R32");
-        // car.setCarId(1L);
     }
-
     
     @Test
     public void whenFindCarValidId_theReturnCar() {
