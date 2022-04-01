@@ -5,7 +5,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+// Ex 2
+// import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,7 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = CarServiceApplication.class)
 
 // Ex 2 Test E
 // @AutoConfigureTestDatabase
@@ -60,7 +61,7 @@ public class CarControllerIT {
         Car c2 = new Car("Dodge", "Trackhawk");
         repository.save(c1);
         repository.save(c2);
-        /* Ex3
+        /* Ex2
         createTestCar("Nissan", "Skyline R32");
         createTestCar("Dodge", "Trackhawk"); */
 
@@ -78,7 +79,7 @@ public class CarControllerIT {
     void whenGetAValidCarId_thenStatus200() {
         Car car = new Car("Ford", "Raptor");
         repository.save(car);
-        // Ex 3
+        // Ex 2
         // repository.saveAndFlush(car);
 
         ResponseEntity<Car> response = restTemplate.getForEntity("/api/details/" + String.valueOf(car.getCarId()), Car.class);
@@ -87,10 +88,11 @@ public class CarControllerIT {
         assertThat(response.getBody()).extracting(Car::getModel).isEqualTo("Raptor");
     }
 
-
+    // Ex 2
+    /* 
     private void createTestCar(String maker, String model) {
         Car car = new Car(maker, model);
         repository.saveAndFlush(car);
     }
-    
+     */
 }
