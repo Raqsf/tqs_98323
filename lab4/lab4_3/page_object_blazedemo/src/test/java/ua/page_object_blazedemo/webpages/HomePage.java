@@ -1,4 +1,4 @@
-package ua.page_object_pattern.webpages;
+package ua.page_object_blazedemo.webpages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -13,7 +13,7 @@ public class HomePage {
     private WebDriver driver;
 
     //Page URL
-    private static String PAGE_URL="https://blazedemo.com/index.php";
+    private static String PAGE_URL="https://blazedemo.com";
 
     //Locators
 

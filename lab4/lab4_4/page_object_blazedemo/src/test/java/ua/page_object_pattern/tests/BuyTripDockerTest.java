@@ -18,7 +18,7 @@ import ua.page_object_pattern.webpages.PurchasePage;
 import ua.page_object_pattern.webpages.FlightsPage;
 import ua.page_object_pattern.webpages.HomePage;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+// import static org.hamcrest.MatcherAssert.assertThat;
 
 // import java.net.URL;
 import java.time.Duration;
@@ -42,7 +42,8 @@ public class BuyTripDockerTest {
 
        //Create object of HomePage Class
        HomePage home = new HomePage(driver);
-       // home.clickOnDeveloperApplyButton();
+
+       // // System.out.println(driver.getTitle());
 
        // Open home page
        Assertions.assertTrue(home.isPageOpened());
@@ -62,6 +63,8 @@ public class BuyTripDockerTest {
        //Check if page is opened
        Assertions.assertTrue(flightsPage.isPageOpened());
 
+       // System.out.println(driver.getTitle());
+
        // Choose third flight
        flightsPage.clickFlight();
 
@@ -70,6 +73,8 @@ public class BuyTripDockerTest {
 
        // Check if page is opened
        Assertions.assertTrue(purchasePage.isPageOpened());
+
+       // System.out.println(driver.getTitle());
 
        // Remember me is not checked
        Assertions.assertTrue(purchasePage.isNotChecked());
@@ -82,29 +87,8 @@ public class BuyTripDockerTest {
        // Check if page is opened
        Assertions.assertTrue(finalPage.isPageOpened());
 
-       /* //Create object of DeveloperPortalPage
-       DeveloperPortalPage devportal= new DeveloperPortalPage(driver);
+       // System.out.println(driver.getTitle());
 
-       //Check if page is opened
-       Assert.assertTrue(devportal.isPageOpened());
-
-       //Click on Join Toptal
-       devportal.clikOnJoin(); */
-
-       //Create object of DeveloperApplyPage
-       // FreelancerApplyPage applyPage = new FreelancerApplyPage(driver);
-
-       //Check if page is opened
-       // Assert.assertTrue(applyPage.isPageOpened());
-
-       //Fill up data
-       /* applyPage.setDeveloper_email("dejan@toptal.com");
-       applyPage.setDeveloper_full_name("Dejan Zivanovic Automated Test");
-       applyPage.setDeveloper_password("password123");
-       applyPage.setDeveloper_password_confirmation("password123"); */
-       /* applyPage.setDeveloper_skype("automated_test_skype"); */
-
-       //Click on join
-       //applyPage.clickOnJoin(); 
+       // System.out.println("DOCKER TEST");
    }
 }

@@ -1,20 +1,20 @@
-package ua.page_object_pattern.tests;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-
-import ua.page_object_pattern.webpages.FinalPage;
-import ua.page_object_pattern.webpages.PurchasePage;
-import ua.page_object_pattern.webpages.FlightsPage;
-import ua.page_object_pattern.webpages.HomePage;
+package ua.page_object_blazedemo.tests;
 
 // import java.net.URL;
 import java.time.Duration;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+import ua.page_object_blazedemo.webpages.FinalPage;
+import ua.page_object_blazedemo.webpages.FlightsPage;
+import ua.page_object_blazedemo.webpages.HomePage;
+import ua.page_object_blazedemo.webpages.PurchasePage;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
