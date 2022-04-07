@@ -5,8 +5,11 @@ import static io.github.bonigarcia.seljup.BrowserType.CHROME;
 import io.github.bonigarcia.seljup.DockerBrowser;
 import io.github.bonigarcia.seljup.SeleniumJupiter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
@@ -15,16 +18,10 @@ import ua.page_object_pattern.webpages.PurchasePage;
 import ua.page_object_pattern.webpages.FlightsPage;
 import ua.page_object_pattern.webpages.HomePage;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 // import java.net.URL;
 import java.time.Duration;
-
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import org.hamcrest.MatcherAssert.*;
-
-import org.junit.jupiter.api.Assertions.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SeleniumJupiter.class)
 public class BuyTripDockerTest {
@@ -48,7 +45,7 @@ public class BuyTripDockerTest {
        // home.clickOnDeveloperApplyButton();
 
        // Open home page
-       Assert.assertTrue(home.isPageOpened());
+       Assertions.assertTrue(home.isPageOpened());
 
        // Choose Boston as departure city
        home.selectFromPort();
@@ -63,7 +60,7 @@ public class BuyTripDockerTest {
        FlightsPage flightsPage = new FlightsPage(driver);
 
        //Check if page is opened
-       Assert.assertTrue(flightsPage.isPageOpened());
+       Assertions.assertTrue(flightsPage.isPageOpened());
 
        // Choose third flight
        flightsPage.clickFlight();
@@ -72,10 +69,10 @@ public class BuyTripDockerTest {
        PurchasePage purchasePage = new PurchasePage(driver);
 
        // Check if page is opened
-       Assert.assertTrue(purchasePage.isPageOpened());
+       Assertions.assertTrue(purchasePage.isPageOpened());
 
        // Remember me is not checked
-       Assert.assertTrue(purchasePage.isNotChecked());
+       Assertions.assertTrue(purchasePage.isNotChecked());
 
        purchasePage.clickPurchaseFlight();
 
@@ -83,7 +80,7 @@ public class BuyTripDockerTest {
        FinalPage finalPage = new FinalPage(driver);
 
        // Check if page is opened
-       Assert.assertTrue(finalPage.isPageOpened());
+       Assertions.assertTrue(finalPage.isPageOpened());
 
        /* //Create object of DeveloperPortalPage
        DeveloperPortalPage devportal= new DeveloperPortalPage(driver);
@@ -110,9 +107,4 @@ public class BuyTripDockerTest {
        //Click on join
        //applyPage.clickOnJoin(); 
    }
-
-    @AfterAll
-    public void close(){
-        driver.close();
-    }
 }
