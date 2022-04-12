@@ -1,3 +1,9 @@
+## f)
+
+The project passed the defined quality gate. To pass the quality gate, the project has to pass a set of threshold measures. Even though the project has 1 bug, several code smells and 1 security hotspot, the project passed the set of treshold measures.
+
+## g)
+
 | **Issue** | **Problem Description** | **How to Solve** |
 |-----------|-------------------------|------------------|
 |Bug|Creating a new Random object each time a random value is needed is inefficient and may produce numbers which are not random depending on the JDK|For better efficiency and randomness, create a single Random (`private Random rand = SecureRandom.getInstanceStrong();`), then store, and reuse it (`int rValue = this.rand.nextInt();`)|

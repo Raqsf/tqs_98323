@@ -15,10 +15,6 @@ public class CarManagerService {
     @Autowired
     private CarRepository carRepository;
 
-    /* public CarManagerService(CarRepository carRepository) {
-        this.carRepository = carRepository;
-    } */
-
     public Car save(Car carEntity) {
         return carRepository.save(carEntity);
     }
@@ -28,8 +24,7 @@ public class CarManagerService {
     }
 
     public Optional<Car> getCarDetails(Long id) {
-        Car car = carRepository.findByCarId(id);
-        return car != null ? Optional.of(car) : Optional.empty();
+        return carRepository.findById(id);
     }
 
     

@@ -1,6 +1,7 @@
 package ua.car_service.car_service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CarRepository extends JpaRepository<Car, Long> {
 
     public List<Car> findAll();
-    public Car findByCarId(Long id);
+    public Optional<Car> findById(Long id);
     
 }
