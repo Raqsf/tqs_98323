@@ -36,7 +36,7 @@
       <artifactId>rest-assured</artifactId>
       <version>5.0.1</version>
       <scope>test</scope>
-</dependency>
+    </dependency>
   </dependencies>
 
   <build>
