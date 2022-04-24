@@ -86,4 +86,7 @@ public class CovidControllerTest {
 
     @Test
     public void whenGetAllStats() {}
+
+    @Test
+    public void whenGetHistoryCorrectCountry() {}
 }
