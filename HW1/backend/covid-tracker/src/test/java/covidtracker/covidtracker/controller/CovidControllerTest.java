@@ -91,5 +91,5 @@ public class CovidControllerTest {
     public void whenGetHistoryCorrectCountryName() {}
 
     @Test
-    public void whenGetHistoryWrongCountryName() {}
+    public void whenGetHistoryWrongCountryName() { }
 }
