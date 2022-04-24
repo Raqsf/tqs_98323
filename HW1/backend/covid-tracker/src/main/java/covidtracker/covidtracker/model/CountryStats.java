@@ -46,11 +46,11 @@ public class CountryStats {
         return tests;
     }
 
-    private String getDay() {
+    public String getDay() {
         return day;
     }
 
-    private String getTime() {
+    public String getTime() {
         return time;
     }
 }

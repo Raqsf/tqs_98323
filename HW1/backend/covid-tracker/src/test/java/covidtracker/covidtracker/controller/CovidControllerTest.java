@@ -1,12 +1,15 @@
 package covidtracker.covidtracker.controller;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -67,12 +70,12 @@ public class CovidControllerTest {
 
     @Test
     public void whenGetStatsByCountry() throws Exception {
-        String country = "portugal";
 
-        when(service.getStatsByCountry(country)).thenReturn(stats);
+        // when(service.existCountry(country)).thenReturn(Collections.emptyList());
+        when(service.getStatsByCountry(stats.getName())).thenReturn(stats);
 
         mvc.perform(
-            get("/api/v1/stats/{country}", country).contentType(MediaType.APPLICATION_JSON))
+            get("/api/v1/stats/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             // Isto era se estivessemos a testar o serviço
             //.andExpect(jsonPath("$response", hasSize(1)))
@@ -80,16 +83,66 @@ public class CovidControllerTest {
             //.andExpect(jsonPath("$parameters.country", is(country)))
             //.andExpect(jsonPath("$response[0].continent", is(stats.getContinent())))
             .andExpect(jsonPath("$[0].continent", is(stats.getContinent())));
+        
+        // verify(service, times(1)).existCountry(country);
+        verify(service, times(1)).getStatsByCountry(stats.getName());
+    }
 
-        verify(service, times(1)).getStatsByCountry(country);
+   /*  @Test
+    public void whenGetStatsByCountryWrongName() throws Exception {
+        String country = "port";
+        List<String> res = new ArrayList<String>();
+        res.add("Country " + country +  " doesn't exist");
+
+        when(service.existCountry(country)).thenReturn(res);
+
+        mvc.perform(
+            get("/api/v1/stats/{country}", country).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
+        
+        verify(service, times(1)).existCountry(country);
+    } */
+
+    @Test
+    public void whenGetAllStats() throws Exception {
+        List<CountryStats> allStats = Arrays.asList(stats);
+
+        when(service.getStats()).thenReturn(allStats);
+
+        mvc.perform(
+            get("/api/v1/stats").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        verify(service, times(1)).getStats();
     }
 
     @Test
-    public void whenGetAllStats() {}
+    public void whenGetHistory() throws Exception {
+
+        List<CountryStats> history = Arrays.asList(stats, stats);
+        when(service.getHistory(stats.getName())).thenReturn(history);
+
+        mvc.perform(
+            get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].name", is(stats.getName())));
+
+        verify(service, times(1)).getHistory(stats.getName());
+    }
 
     @Test
-    public void whenGetHistoryCorrectCountryName() {}
+    public void whenGetHistoryWithDate() throws Exception {
 
-    @Test
-    public void whenGetHistoryWrongCountryName() { }
+        List<CountryStats> history = Arrays.asList(stats, stats);
+
+        when(service.getHistory(stats.getName(), stats.getDay())).thenReturn(history);
+
+        mvc.perform(
+            get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON).param("date", stats.getDay()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].day", is(stats.getDay())))
+            .andExpect(jsonPath("$[0].name", is(stats.getName())));
+
+        verify(service, times(1)).getHistory(stats.getName(), stats.getDay());
+    }
 }
