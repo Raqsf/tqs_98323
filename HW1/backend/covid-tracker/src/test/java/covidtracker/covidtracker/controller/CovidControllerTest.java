@@ -84,9 +84,9 @@ public class CovidControllerTest {
         verify(service, times(1)).getStatsByCountry(country);
     }
 
-    @Test
+    /* @Test
     public void whenGetAllStats() {}
 
     @Test
-    public void whenGetHistoryCorrectCountry() {}
+    public void whenGetHistoryCorrectCountry() {} */
 }
