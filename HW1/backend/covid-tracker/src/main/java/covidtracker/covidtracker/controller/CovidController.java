@@ -42,7 +42,9 @@ public class CovidController {
             // return new ResponseEntity<>(Optional.of(existsCountry), HttpStatus.NOT_FOUND);
         }
 
-        return covidService.getStats().isPresent() ? ResponseEntity.ok(covidService.getStats().get()) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
+        Optional<List<CountryStats>> result = covidService.getStats();
+
+        return result.isPresent() ? ResponseEntity.ok(result.get()) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/history/{country}")
