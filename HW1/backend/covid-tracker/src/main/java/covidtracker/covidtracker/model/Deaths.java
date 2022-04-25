@@ -1,20 +1,20 @@
 package covidtracker.covidtracker.model;
 
 public class Deaths extends Stats {
-    private String newDeaths;
+    private int newDeaths;
 
     // NOTE: newDeaths can be null 
     
-    public Deaths(String newDeaths, String oneMPop, int totalCases) {
+    public Deaths(int newDeaths, int oneMPop, int totalCases) {
         super(oneMPop, totalCases);
         this.newDeaths = newDeaths;
     }
 
-    public Deaths(String oneMPop, int totalCases) {
+    /* public Deaths(int oneMPop, int totalCases) {
         super(oneMPop, totalCases);
-    }
+    } */
 
-    public String getNewDeaths() {
+    public int getNewDeaths() {
         return newDeaths;
     }
 }

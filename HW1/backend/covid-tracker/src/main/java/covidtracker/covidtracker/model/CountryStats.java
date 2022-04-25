@@ -22,6 +22,8 @@ public class CountryStats {
         this.time = time;
     }
 
+    public CountryStats () {}
+
     public String getContinent() {
         return continent;
     }

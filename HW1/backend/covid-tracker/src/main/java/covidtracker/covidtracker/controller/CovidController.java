@@ -1,10 +1,12 @@
 package covidtracker.covidtracker.controller;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,21 +28,21 @@ public class CovidController {
     private CovidService covidService;
 
     @GetMapping(value = {"/stats", "/stats/{country}"})
-    public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) {
+    public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) throws InterruptedException {
 
         if(country.isPresent()) {
             // SELECT no codigo, assim pessoas não podem escolher pais errado
             // List<String> existsCountry = covidService.existCountry(country.get());
 
             //if(existsCountry.isEmpty()) {
-            CountryStats result = covidService.getStatsByCountry(country.get());
-            return ResponseEntity.ok(Arrays.asList(result));
+            Optional<CountryStats> result = covidService.getStatsByCountry(country.get());
+            return result.isPresent() ? ResponseEntity.ok(Arrays.asList(result.get())) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
             //} 
 
             // return new ResponseEntity<>(Optional.of(existsCountry), HttpStatus.NOT_FOUND);
         }
 
-        return ResponseEntity.ok(covidService.getStats());
+        return covidService.getStats().isPresent() ? ResponseEntity.ok(covidService.getStats().get()) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/history/{country}")
@@ -60,4 +62,6 @@ public class CovidController {
 
         // return new ResponseEntity<>(Optional.of(existsCountry), HttpStatus.NOT_FOUND);
     }
+
+    // TODO: metodo que vai buscar todos os paises
 }

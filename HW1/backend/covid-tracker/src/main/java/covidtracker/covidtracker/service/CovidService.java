@@ -1,34 +1,63 @@
 package covidtracker.covidtracker.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import covidtracker.covidtracker.model.CountryStats;
+import covidtracker.covidtracker.utils.HttpRequests;
 
 /**
  * CovidService
  */
 @Service
 public class CovidService {
-    // https://covid-193.p.rapidapi.com
 
-    public CountryStats getStatsByCountry(String string) {
-        return null;
+    private static Logger logger = Logger.getLogger(CovidService.class.getName());
+
+    public static final String BASE_URL = "https://covid-193.p.rapidapi.com";
+
+    @Autowired
+    private HttpRequests request;
+
+    public Optional<CountryStats> getStatsByCountry(String country) {
+        try {
+            return Optional.of(request.getCountryStats(country));
+        } catch (IOException | InterruptedException e) {
+            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+
+            return Optional.empty();
+        }
     }
 
-    public List<CountryStats> getStats() {
-        // colocar todas as stats num array e não em 3
-        return Collections.emptyList();
+    public Optional<List<CountryStats>> getStats() {
+        try {
+            return Optional.of(request.getAllCountryStats());
+        } catch (IOException | InterruptedException e) {
+            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+
+            return Optional.empty();
+        }
     }
 
-    public List<String> existCountry(String country) {
+    /* public List<String> existCountry(String country) {
         // se o pais existir, retornar lista vazia
         // se não existir (results: 0), retornar paises parecidos ou mensagem de erro
         return country.equals("") ? Collections.emptyList() : new ArrayList<>();
-    }
+    } */
 
     public List<CountryStats> getHistory(String country) {
         return Collections.emptyList();

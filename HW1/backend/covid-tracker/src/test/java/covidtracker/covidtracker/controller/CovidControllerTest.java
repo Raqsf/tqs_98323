@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -65,14 +66,14 @@ public class CovidControllerTest {
             "time":"2022-04-20T10:15:03+00:00"
         }
         */
-        stats = new CountryStats("Europe", "Portugal", 10143368, new Cases(61, "366691", 3719485), new Deaths("2168", 21993), new Tests("4017243", 40748372), "2022-04-20", "2022-04-20T10:15:03+00:00");
+        stats = new CountryStats("Europe", "Portugal", 10143368, new Cases(-1, -1, 61, -1, 366691, 3719485), new Deaths(-1, 2168, 21993), new Tests(4017243, 40748372), "2022-04-20", "2022-04-20T10:15:03+00:00");
     }
 
     @Test
     public void whenGetStatsByCountry() throws Exception {
 
         // when(service.existCountry(country)).thenReturn(Collections.emptyList());
-        when(service.getStatsByCountry(stats.getName())).thenReturn(stats);
+        when(service.getStatsByCountry(stats.getName())).thenReturn(Optional.of(stats));
 
         mvc.perform(
             get("/api/v1/stats/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +108,7 @@ public class CovidControllerTest {
     public void whenGetAllStats() throws Exception {
         List<CountryStats> allStats = Arrays.asList(stats);
 
-        when(service.getStats()).thenReturn(allStats);
+        when(service.getStats()).thenReturn(Optional.of(allStats));
 
         mvc.perform(
             get("/api/v1/stats").contentType(MediaType.APPLICATION_JSON))
