@@ -214,4 +214,16 @@ public class CovidControllerTest {
 
         verify(service, times(1)).getAllCountries();
     }    
+
+    @Test
+    public void whenGetAllCountries_SomethingWrong() throws Exception {
+
+        when(service.getAllCountries()).thenReturn(Optional.empty());
+
+        mvc.perform(
+            get("/api/v1/countries").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+
+        verify(service, times(1)).getAllCountries();
+    }  
 }

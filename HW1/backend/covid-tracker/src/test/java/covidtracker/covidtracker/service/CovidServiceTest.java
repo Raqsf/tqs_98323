@@ -122,6 +122,16 @@ public class CovidServiceTest {
     }
 
     @Test
+    public void whenGetCountryHistory_SomethingWrong() throws IOException, InterruptedException {
+        
+        when(requests.getCountryHistory(stats.getName())).thenThrow(IOException.class);
+
+        assertEquals(covidService.getHistory(stats.getName()), Optional.empty());
+
+        verify(requests, times(1)).getCountryHistory(stats.getName());
+    }
+
+    @Test
     public void whenGetCountryHistoryByDay() throws IOException, InterruptedException {
         CountryStats newStats = stats;
         newStats.setTime("2022-04-25T18:30:04+00:00");
@@ -134,11 +144,32 @@ public class CovidServiceTest {
     }
 
     @Test
+    public void whenGetCountryHistoryByDay_SomethingWrong() throws IOException, InterruptedException {
+        
+        when(requests.getCountryHistoryByDay(stats.getName(), stats.getDay())).thenThrow(IOException.class);
+
+        assertEquals(covidService.getHistory(stats.getName(), stats.getDay()), Optional.empty());
+
+        verify(requests, times(1)).getCountryHistoryByDay(stats.getName(), stats.getDay());
+    }
+
+    @Test
     public void whenGetAllCountries() throws IOException, InterruptedException {
 
         when(requests.getCountries()).thenReturn(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
 
         assertEquals(covidService.getAllCountries(), Optional.of(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra")));
+
+        verify(requests, times(1)).getCountries();
+
+    }
+
+    @Test
+    public void whenGetAllCountries_SomethingWrong() throws IOException, InterruptedException {
+
+        when(requests.getCountries()).thenThrow(IOException.class);
+
+        assertEquals(covidService.getAllCountries(), Optional.empty());
 
         verify(requests, times(1)).getCountries();
 
