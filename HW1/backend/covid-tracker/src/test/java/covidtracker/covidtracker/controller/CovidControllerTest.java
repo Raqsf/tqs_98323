@@ -121,7 +121,7 @@ public class CovidControllerTest {
     public void whenGetHistory() throws Exception {
 
         List<CountryStats> history = Arrays.asList(stats, stats);
-        when(service.getHistory(stats.getName())).thenReturn(history);
+        when(service.getHistory(stats.getName())).thenReturn(Optional.of(history));
 
         mvc.perform(
             get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
@@ -136,7 +136,7 @@ public class CovidControllerTest {
 
         List<CountryStats> history = Arrays.asList(stats, stats);
 
-        when(service.getHistory(stats.getName(), stats.getDay())).thenReturn(history);
+        when(service.getHistory(stats.getName(), stats.getDay())).thenReturn(Optional.of(history));
 
         mvc.perform(
             get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON).param("date", stats.getDay()))
@@ -146,4 +146,20 @@ public class CovidControllerTest {
 
         verify(service, times(1)).getHistory(stats.getName(), stats.getDay());
     }
+
+    @Test
+    public void whenGetAllCountries() throws Exception {
+
+        when(service.getAllCountries()).thenReturn(Optional.of(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra")));
+
+        mvc.perform(
+            get("/api/v1/countries").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0]", is("Afghanistan")))
+            .andExpect(jsonPath("$[1]", is("Albania")))
+            .andExpect(jsonPath("$[2]", is("Algeria")))
+            .andExpect(jsonPath("$[3]", is("Andorra")));
+
+        verify(service, times(1)).getAllCountries();
+    }    
 }

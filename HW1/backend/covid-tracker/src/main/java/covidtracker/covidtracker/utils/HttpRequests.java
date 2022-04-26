@@ -7,9 +7,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -32,16 +37,33 @@ public class HttpRequests {
     private static final String API_KEY = "f90020ba9dmsh31ec284026a13edp109b7djsn4ff85c39b60d";
     
 
-    private JSONObject doRequest(String uri) throws IOException, InterruptedException {
+    private JSONObject doRequest(String uri, Optional<Map<String, Object>> params) throws IOException, InterruptedException {
 
         logger.log(Level.INFO, "Requesting to API ...");
 
-        HttpRequest request = HttpRequest.newBuilder()
-		.uri(URI.create(uri))
-		.header("X-RapidAPI-Host", "covid-193.p.rapidapi.com")
-		.header("X-RapidAPI-Key", API_KEY)
-		.method("GET", HttpRequest.BodyPublishers.noBody())
-		.build();
+        HttpRequest request;
+
+        if(params.isPresent()) {
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(params);
+            
+            request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .header("X-RapidAPI-Host", "covid-193.p.rapidapi.com")
+            .header("X-RapidAPI-Key", API_KEY)
+            .method("GET", HttpRequest.BodyPublishers.ofString(requestBody))
+            .build();
+
+        } else {
+
+            request = HttpRequest.newBuilder()
+            .uri(URI.create(uri))
+            .header("X-RapidAPI-Host", "covid-193.p.rapidapi.com")
+            .header("X-RapidAPI-Key", API_KEY)
+            .method("GET", HttpRequest.BodyPublishers.noBody())
+            .build();
+        }
 
         try {
 
@@ -50,7 +72,9 @@ public class HttpRequests {
 
         } catch (InterruptedException e) {
             logger.log(Level.WARNING, e.getMessage());
+
             throw e;
+
         }
 
     }
@@ -62,7 +86,7 @@ public class HttpRequests {
         String query = String.format("/statistics?country=%s", URLEncoder.encode(country, charset));
 
         String url = BASE_URL + query;
-        JSONObject requestResponse = doRequest(url);
+        JSONObject requestResponse = doRequest(url, Optional.empty());
 
         JSONArray responseArray = requestResponse.getJSONArray("response");
 
@@ -75,7 +99,7 @@ public class HttpRequests {
         String query = "/statistics";
 
         String url = BASE_URL + query;
-        JSONObject requestResponse = doRequest(url);
+        JSONObject requestResponse = doRequest(url, Optional.empty());
 
         JSONArray responseArray = requestResponse.getJSONArray("response");
 
@@ -88,13 +112,69 @@ public class HttpRequests {
         return result;
     }
 
-    public List<CountryStats> getCountryHistory(String country) {
-        return Collections.emptyList();
+    public List<CountryStats> getCountryHistory(String country) throws IOException, InterruptedException {
+        String query = "/history";
+
+        String url = BASE_URL + query;
+        Map<String, Object> params = new HashMap<>();
+        params.put("country", country);
+        
+        JSONObject requestResponse = doRequest(url, Optional.of(params));
+
+        JSONArray responseArray = requestResponse.getJSONArray("response");
+
+        List<CountryStats> result = new ArrayList<>();
+
+        for(int i = 0; i < responseArray.length(); i++) {
+            result.add(getCountryStats(responseArray, i));
+        }
+
+        return result;
         
     }
 
-    public List<CountryStats> getCountryHistoryByDay(String country, String date) {
-        return Collections.emptyList();
+    public List<CountryStats> getCountryHistoryByDay(String country, String date) throws IOException, InterruptedException {
+        String query = "/history";
+
+        String url = BASE_URL + query;
+        Map<String, Object> params = new HashMap<>();
+        params.put("country", country);
+        params.put("date", date);
+        
+        JSONObject requestResponse = doRequest(url, Optional.of(params));
+
+        JSONArray responseArray = requestResponse.getJSONArray("response");
+
+        List<CountryStats> result = new ArrayList<>();
+
+        for(int i = 0; i < responseArray.length(); i++) {
+            result.add(getCountryStats(responseArray, i));
+        }
+
+        return result;
+    }
+
+    public List<String> getCountries() throws IOException, InterruptedException {
+        logger.log(Level.INFO, "Get countries");
+
+        String query = "/countries";
+
+        String url = BASE_URL + query;
+        JSONObject requestResponse = doRequest(url, Optional.empty());
+
+        JSONArray responseArray = requestResponse.getJSONArray("response");
+
+        List<String> result = new ArrayList<>();
+
+        for(int i = 0; i < responseArray.length(); i++) {
+            result.add(getCountryName(responseArray, i));
+        }
+
+        return result;
+    }
+
+    private String getCountryName(JSONArray responseArray, int index) {
+        return responseArray.getString(index);
     }
 
     private CountryStats getCountryStats(JSONArray responseArray, int index) {

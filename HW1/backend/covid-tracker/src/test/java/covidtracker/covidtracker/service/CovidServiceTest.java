@@ -86,9 +86,39 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetCountryHistory() {}
+    public void whenGetCountryHistory() throws IOException, InterruptedException {
+        
+        CountryStats newStats = stats;
+        newStats.setTime("2022-04-25T18:30:04+00:00");
+
+        when(requests.getCountryHistory(stats.getName())).thenReturn(Arrays.asList(stats, newStats));
+
+        assertEquals(covidService.getHistory(stats.getName()), Optional.of(Arrays.asList(stats, newStats)));
+
+        verify(requests, times(1)).getCountryHistory(stats.getName());
+    }
 
     @Test
-    public void whenGetCountryHistoryByDay() {}
+    public void whenGetCountryHistoryByDay() throws IOException, InterruptedException {
+        CountryStats newStats = stats;
+        newStats.setTime("2022-04-25T18:30:04+00:00");
+
+        when(requests.getCountryHistoryByDay(stats.getName(), stats.getDay())).thenReturn(Arrays.asList(stats, newStats));
+
+        assertEquals(covidService.getHistory(stats.getName(), stats.getDay()), Optional.of(Arrays.asList(stats, newStats)));
+
+        verify(requests, times(1)).getCountryHistoryByDay(stats.getName(), stats.getDay());
+    }
+
+    @Test
+    public void whenGetAllCountries() throws IOException, InterruptedException {
+
+        when(requests.getCountries()).thenReturn(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
+
+        assertEquals(covidService.getAllCountries(), Optional.of(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra")));
+
+        verify(requests, times(1)).getCountries();
+
+    }
 
 }

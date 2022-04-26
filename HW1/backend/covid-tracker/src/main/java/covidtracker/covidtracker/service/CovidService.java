@@ -1,8 +1,6 @@
 package covidtracker.covidtracker.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -59,12 +57,43 @@ public class CovidService {
         return country.equals("") ? Collections.emptyList() : new ArrayList<>();
     } */
 
-    public List<CountryStats> getHistory(String country) {
-        return Collections.emptyList();
+    public Optional<List<CountryStats>> getHistory(String country) {
+        try {
+            return Optional.of(request.getCountryHistory(country));
+        } catch (IOException | InterruptedException e) {
+            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+
+            return Optional.empty();
+        }
     }
 
-    public List<CountryStats> getHistory(String country, String date) {
-        return Collections.emptyList();
+    public Optional<List<CountryStats>> getHistory(String country, String date) {
+        try {
+            return Optional.of(request.getCountryHistoryByDay(country, date));
+        } catch (IOException | InterruptedException e) {
+            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+
+            return Optional.empty();
+        }
+    }
+
+    public Optional<List<String>> getAllCountries() {
+        try {
+            return Optional.of(request.getCountries());
+        } catch (IOException | InterruptedException e) {
+            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+
+            return Optional.empty();
+        }
     }
 
 }

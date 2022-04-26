@@ -28,7 +28,7 @@ public class CovidController {
     private CovidService covidService;
 
     @GetMapping(value = {"/stats", "/stats/{country}"})
-    public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) throws InterruptedException {
+    public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) {
 
         if(country.isPresent()) {
             // SELECT no codigo, assim pessoas não podem escolher pais errado
@@ -55,9 +55,19 @@ public class CovidController {
         List<CountryStats> result;
 
         if(date.isEmpty()) {
-            result = covidService.getHistory(country);
+            Optional<List<CountryStats>> countryStats = covidService.getHistory(country);
+            if(countryStats.isPresent()) {
+                result = countryStats.get();
+            } else {
+                return new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
+            }
         } else {
-            result = covidService.getHistory(country, date.get());
+            Optional<List<CountryStats>> countryStats = covidService.getHistory(country, date.get());
+            if(countryStats.isPresent()) {
+                result = countryStats.get();
+            } else {
+                return new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
+            }
         }
         return ResponseEntity.ok(result);
         //} 
@@ -65,5 +75,11 @@ public class CovidController {
         // return new ResponseEntity<>(Optional.of(existsCountry), HttpStatus.NOT_FOUND);
     }
 
-    // TODO: metodo que vai buscar todos os paises
+    @GetMapping("/countries")
+    public ResponseEntity<List<String>> getAllCountries() {
+
+        Optional<List<String>> result = covidService.getAllCountries();
+
+        return result.isPresent() ? ResponseEntity.ok(result.get()) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
+    }
 }
