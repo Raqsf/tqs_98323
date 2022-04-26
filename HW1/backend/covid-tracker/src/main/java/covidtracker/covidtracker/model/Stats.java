@@ -11,7 +11,7 @@ public class Stats {
         this.total = total;
     }
 
-    public Stats() {}
+    // public Stats() {}
 
     public int getOneMPop() {
         return oneMPop;

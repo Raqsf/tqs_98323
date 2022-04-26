@@ -1,6 +1,7 @@
 package covidtracker.covidtracker.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,11 +77,33 @@ public class CovidServiceTest {
     }
 
     @Test
+    public void whenGetStatsByCountry_SomethingWrong() throws IOException, InterruptedException {
+
+        when(requests.getCountryStats("portugal")).thenThrow(IOException.class);
+
+        //assertThrows(IOException.class, () -> covidService.getStatsByCountry("portugal"));
+        assertEquals(covidService.getStatsByCountry("portugal"), Optional.empty());
+
+        verify(requests, times(1)).getCountryStats("portugal");
+        // verify(requests, times(1)).doRequest(Mockito.any());
+    }
+
+    @Test
     public void whenGetStatsAllCountries() throws IOException, InterruptedException {
 
         when(requests.getAllCountryStats()).thenReturn(Arrays.asList(stats, stats));
 
         assertEquals(covidService.getStats(), Optional.of(Arrays.asList(stats, stats)));
+
+        verify(requests, times(1)).getAllCountryStats();
+    }
+
+    @Test
+    public void whenGetStatsAllCountries_SomethingWrong() throws IOException, InterruptedException {
+
+        when(requests.getAllCountryStats()).thenThrow(IOException.class);
+
+        assertEquals(covidService.getStats(), Optional.empty());
 
         verify(requests, times(1)).getAllCountryStats();
     }

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import covidtracker.covidtracker.model.Cases;
@@ -83,7 +84,22 @@ public class CovidControllerTest {
             //.andExpect(jsonPath("$results", is(1)))
             //.andExpect(jsonPath("$parameters.country", is(country)))
             //.andExpect(jsonPath("$response[0].continent", is(stats.getContinent())))
-            .andExpect(jsonPath("$[0].continent", is(stats.getContinent())));
+            .andExpect(jsonPath("$[0].continent", is(stats.getContinent())))
+            .andExpect(jsonPath("$[0].name", is(stats.getName())));
+        
+        // verify(service, times(1)).existCountry(country);
+        verify(service, times(1)).getStatsByCountry(stats.getName());
+    }
+
+    @Test
+    public void whenGetStatsByCountry_SomethingWrong() throws Exception {
+
+        // when(service.existCountry(country)).thenReturn(Collections.emptyList());
+        when(service.getStatsByCountry(stats.getName())).thenReturn(Optional.empty());
+
+        mvc.perform(
+            get("/api/v1/stats/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
         
         // verify(service, times(1)).existCountry(country);
         verify(service, times(1)).getStatsByCountry(stats.getName());
@@ -118,6 +134,18 @@ public class CovidControllerTest {
     }
 
     @Test
+    public void whenGetAllStats_SomethingWrong() throws Exception {
+        
+        when(service.getStats()).thenReturn(Optional.empty());
+
+        mvc.perform(
+            get("/api/v1/stats").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+
+        verify(service, times(1)).getStats();
+    }
+
+    @Test
     public void whenGetHistory() throws Exception {
 
         List<CountryStats> history = Arrays.asList(stats, stats);
@@ -127,6 +155,18 @@ public class CovidControllerTest {
             get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].name", is(stats.getName())));
+
+        verify(service, times(1)).getHistory(stats.getName());
+    }
+
+    @Test
+    public void whenGetHistory_SomethingWrong() throws Exception {
+
+        when(service.getHistory(stats.getName())).thenReturn(Optional.empty());
+
+        mvc.perform(
+            get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
 
         verify(service, times(1)).getHistory(stats.getName());
     }
@@ -143,6 +183,18 @@ public class CovidControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].day", is(stats.getDay())))
             .andExpect(jsonPath("$[0].name", is(stats.getName())));
+
+        verify(service, times(1)).getHistory(stats.getName(), stats.getDay());
+    }
+
+    @Test
+    public void whenGetHistoryWithDate_SomethingWrong() throws Exception {
+
+        when(service.getHistory(stats.getName(), stats.getDay())).thenReturn(Optional.empty());
+
+        mvc.perform(
+            get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON).param("date", stats.getDay()))
+            .andExpect(status().isBadRequest());
 
         verify(service, times(1)).getHistory(stats.getName(), stats.getDay());
     }
