@@ -18,7 +18,7 @@ import covidtracker.covidtracker.model.CountryStats;
 import covidtracker.covidtracker.service.CovidService;
 
 /**
- * CovidService
+ * CovidSController
  */
 @RestController
 @RequestMapping("/api/v1")
