@@ -32,6 +32,7 @@ public class CacheTest{
         assertEquals(0, cache.size());
         assertEquals(0, cache.getHitCount());
         assertEquals(0, cache.getMissCount());
+        assertEquals(0, cache.getRequestCount());
         assertEquals(0, cache.getHitRatio());
     }
 
@@ -41,6 +42,7 @@ public class CacheTest{
         assertEquals(1, cache.size());
         assertEquals(0, cache.getHitCount());
         assertEquals(0, cache.getMissCount());
+        assertEquals(0, cache.getRequestCount());
         assertEquals(0, cache.getHitRatio());
     } 
 
@@ -52,6 +54,7 @@ public class CacheTest{
         assertEquals(1, cache.size());
         assertEquals(1, cache.getHitCount());
         assertEquals(0, cache.getMissCount());
+        assertEquals(1, cache.getRequestCount());
         assertEquals(1, cache.getHitRatio());
     }
 
@@ -63,6 +66,7 @@ public class CacheTest{
         assertEquals(1, cache.size());
         assertEquals(0, cache.getHitCount());
         assertEquals(1, cache.getMissCount());
+        assertEquals(1, cache.getRequestCount());
         assertEquals(0, cache.getHitRatio());
     }
 
