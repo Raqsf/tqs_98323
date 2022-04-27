@@ -1,7 +1,9 @@
 package covidtracker.covidtracker.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,11 +29,19 @@ public class CovidService {
     private HttpRequests request;
 
     // @Autowired
-    private Cache<String, CountryStats> cache = new Cache<>(300, 300);
+    private Cache<String, Object> cache = new Cache<>(300, 300);
 
     public Optional<CountryStats> getStatsByCountry(String country) {
+        CountryStats cacheResult = (CountryStats) cache.get("/stats/" + country);
+
+        if(cacheResult != null) {
+            return Optional.of(cacheResult);
+        }
+
         try {
-            return Optional.of(request.getCountryStats(country));
+            CountryStats result = request.getCountryStats(country);
+            cache.put("/stats/" + country, result);
+            return Optional.of(result);
         } catch (IOException | InterruptedException e) {
             logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
 
@@ -43,8 +53,16 @@ public class CovidService {
     }
 
     public Optional<List<CountryStats>> getStats() {
+        List<CountryStats> cacheResult = (List<CountryStats>) cache.get("/stats");
+
+        if(cacheResult != null) {
+            return Optional.of(cacheResult);
+        }
+
         try {
-            return Optional.of(request.getAllCountryStats());
+            List<CountryStats> result = request.getAllCountryStats();
+            cache.put("/stats", result);
+            return Optional.of(result);
         } catch (IOException | InterruptedException e) {
             logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
             
@@ -62,8 +80,15 @@ public class CovidService {
     } */
 
     public Optional<List<CountryStats>> getHistory(String country) {
+        List<CountryStats> cacheResult = (List<CountryStats>) cache.get("/history/" + country);
+
+        if(cacheResult != null) {
+            return Optional.of(cacheResult);
+        }
         try {
-            return Optional.of(request.getCountryHistory(country));
+            List<CountryStats> result = request.getCountryHistory(country);
+            cache.put("/history/" + country, result);
+            return Optional.of(result);
         } catch (IOException | InterruptedException e) {
             logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
             
@@ -75,8 +100,16 @@ public class CovidService {
     }
 
     public Optional<List<CountryStats>> getHistory(String country, String date) {
+        List<CountryStats> cacheResult = (List<CountryStats>) cache.get("/history/" + country + "/" + date);
+
+        if(cacheResult != null) {
+            return Optional.of(cacheResult);
+        }
+
         try {
-            return Optional.of(request.getCountryHistoryByDay(country, date));
+            List<CountryStats> result = request.getCountryHistoryByDay(country, date);
+            cache.put("/history/" + country + "/" + date, result);
+            return Optional.of(result);
         } catch (IOException | InterruptedException e) {
             logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
             
@@ -88,8 +121,16 @@ public class CovidService {
     }
 
     public Optional<List<String>> getAllCountries() {
+        List<String> cacheResult = (List<String>) cache.get("/countries");
+
+        if(cacheResult != null) {
+            return Optional.of(cacheResult);
+        }
+
         try {
-            return Optional.of(request.getCountries());
+            List<String> result = request.getCountries();
+            cache.put("/countries", result);
+            return Optional.of(result);
         } catch (IOException | InterruptedException e) {
             logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
             
@@ -98,6 +139,19 @@ public class CovidService {
 
             return Optional.empty();
         }
+    }
+
+    public Map<String, Object> getCacheDetails() {
+        logger.log(Level.INFO, "CACHE DETAILS");
+        
+        Map<String, Object> details = new HashMap<>();
+        details.put("hits", cache.getHitCount());
+        details.put("misses", cache.getMissCount());
+        details.put("size", cache.size());
+        details.put("requests", cache.getRequestCount());
+        details.put("hitRatio", cache.getHitRatio());
+
+        return details;
     }
 
 }

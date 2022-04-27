@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import covidtracker.covidtracker.cache.Cache;
 import covidtracker.covidtracker.model.Cases;
 import covidtracker.covidtracker.model.CountryStats;
 import covidtracker.covidtracker.model.Deaths;
@@ -27,6 +28,9 @@ public class CovidServiceTest {
 
     @Mock( lenient = true)
     private HttpRequests requests;
+
+    @Mock( lenient = true)
+    private Cache<String, Object> cache;
 
     @InjectMocks
     private CovidService covidService;
@@ -64,13 +68,28 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetStatsByCountry() throws IOException, InterruptedException {
+    public void whenGetStatsByCountry_InCache() throws IOException, InterruptedException {
 
+        when(cache.get("/stats/portugal")).thenReturn(stats);
+        //when(requests.getCountryStats("portugal")).thenReturn(stats);
+
+        assertEquals(covidService.getStatsByCountry("portugal"), Optional.of(stats));
+
+        verify(cache, times(1)).get("/stats/portugal");
+        // verify(requests, times(1)).doRequest(Mockito.any());
+    }
+
+    @Test
+    public void whenGetStatsByCountry_NotInCache() throws IOException, InterruptedException {
+
+        when(cache.get("/stats/portugal")).thenReturn(null);
         when(requests.getCountryStats("portugal")).thenReturn(stats);
 
         assertEquals(covidService.getStatsByCountry("portugal"), Optional.of(stats));
 
+        verify(cache, times(1)).get("/stats/portugal");
         verify(requests, times(1)).getCountryStats("portugal");
+        verify(cache, times(1)).put("/stats/portugal", stats);
         // verify(requests, times(1)).doRequest(Mockito.any());
     }
 
@@ -87,13 +106,26 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetStatsAllCountries() throws IOException, InterruptedException {
+    public void whenGetStatsAllCountries_InCache() throws IOException, InterruptedException {
 
+        when(cache.get("/stats")).thenReturn(Arrays.asList(stats, stats));
+
+        assertEquals(covidService.getStats(), Optional.of(Arrays.asList(stats, stats)));
+
+        verify(cache, times(1)).get("/stats");
+    }
+
+    @Test
+    public void whenGetStatsAllCountries_NotInCache() throws IOException, InterruptedException {
+
+        when(cache.get("/stats")).thenReturn(null);
         when(requests.getAllCountryStats()).thenReturn(Arrays.asList(stats, stats));
 
         assertEquals(covidService.getStats(), Optional.of(Arrays.asList(stats, stats)));
 
+        verify(cache, times(1)).get("/stats");
         verify(requests, times(1)).getAllCountryStats();
+        verify(cache, times(1)).put("/stats", Arrays.asList(stats, stats));
     }
 
     @Test
@@ -107,16 +139,32 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetCountryHistory() throws IOException, InterruptedException {
+    public void whenGetCountryHistory_InCache() throws IOException, InterruptedException {
         
         CountryStats newStats = stats;
         newStats.setTime("2022-04-25T18:30:04+00:00");
 
+        when(cache.get("/history/" + stats.getName())).thenReturn(Arrays.asList(stats, newStats));
+
+        assertEquals(covidService.getHistory(stats.getName()), Optional.of(Arrays.asList(stats, newStats)));
+
+        verify(cache, times(1)).get("/history/" + stats.getName());
+    }
+
+    @Test
+    public void whenGetCountryHistory_NotInCache() throws IOException, InterruptedException {
+        
+        CountryStats newStats = stats;
+        newStats.setTime("2022-04-25T18:30:04+00:00");
+
+        when(cache.get("/history/" + stats.getName())).thenReturn(null);
         when(requests.getCountryHistory(stats.getName())).thenReturn(Arrays.asList(stats, newStats));
 
         assertEquals(covidService.getHistory(stats.getName()), Optional.of(Arrays.asList(stats, newStats)));
 
+        verify(cache, times(1)).get("/history/" + stats.getName());
         verify(requests, times(1)).getCountryHistory(stats.getName());
+        verify(cache, times(1)).put("/history/" + stats.getName(), Arrays.asList(stats, newStats));
     }
 
     @Test
@@ -130,16 +178,32 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetCountryHistoryByDay() throws IOException, InterruptedException {
+    public void whenGetCountryHistoryByDay_InCache() throws IOException, InterruptedException {
         CountryStats newStats = stats;
         newStats.setTime("2022-04-25T18:30:04+00:00");
 
+        when(cache.get("/history/" + stats.getName() + "/" + stats.getDay())).thenReturn(Arrays.asList(stats, newStats));
+
+        assertEquals(covidService.getHistory(stats.getName(), stats.getDay()), Optional.of(Arrays.asList(stats, newStats)));
+
+        verify(cache, times(1)).get("/history/" + stats.getName() + "/" + stats.getDay());
+    }
+
+    @Test
+    public void whenGetCountryHistoryByDay_NotInCache() throws IOException, InterruptedException {
+        CountryStats newStats = stats;
+        newStats.setTime("2022-04-25T18:30:04+00:00");
+
+        when(cache.get("/history/" + stats.getName() + "/" + stats.getDay())).thenReturn(null);
         when(requests.getCountryHistoryByDay(stats.getName(), stats.getDay())).thenReturn(Arrays.asList(stats, newStats));
 
         assertEquals(covidService.getHistory(stats.getName(), stats.getDay()), Optional.of(Arrays.asList(stats, newStats)));
 
+        verify(cache, times(1)).get("/history/" + stats.getName() + "/" + stats.getDay());
         verify(requests, times(1)).getCountryHistoryByDay(stats.getName(), stats.getDay());
+        verify(cache, times(1)).put("/history/" + stats.getName() + "/" + stats.getDay(), Arrays.asList(stats, newStats));
     }
+
 
     @Test
     public void whenGetCountryHistoryByDay_SomethingWrong() throws IOException, InterruptedException {
@@ -152,14 +216,27 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetAllCountries() throws IOException, InterruptedException {
+    public void whenGetAllCountries_InCache() throws IOException, InterruptedException {
 
+        when(cache.get("/countries")).thenReturn(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
+
+        assertEquals(covidService.getAllCountries(), Optional.of(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra")));
+
+        verify(cache, times(1)).get("/countries");
+
+    }
+
+    @Test
+    public void whenGetAllCountries_NotInCache() throws IOException, InterruptedException {
+
+        when(cache.get("/countires")).thenReturn(null);
         when(requests.getCountries()).thenReturn(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
 
         assertEquals(covidService.getAllCountries(), Optional.of(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra")));
 
+        verify(cache, times(1)).get("/countries");
         verify(requests, times(1)).getCountries();
-
+        verify(cache, times(1)).put("/countries", Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
     }
 
     @Test

@@ -8,7 +8,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -225,4 +227,30 @@ public class CovidControllerTest {
 
         verify(service, times(1)).getAllCountries();
     }  
+
+    @Test
+    public void whenGetCacheDetails() throws Exception {
+        int hit = 0, miss = 1, request = 1, size = 1;
+        double hitRatio = 1;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("hits", hit);
+        result.put("misses", miss);
+        result.put("requests", request);
+        result.put("hitRatio", hitRatio);
+        result.put("size", size);
+
+        when(service.getCacheDetails()).thenReturn(result);
+
+        mvc.perform(
+            get("/api/v1/cache/details").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.hits", is(hit)))
+            .andExpect(jsonPath("$.misses", is(miss)))
+            .andExpect(jsonPath("$.requests", is(request)))
+            .andExpect(jsonPath("$.hitRatio", is(hitRatio)))
+            .andExpect(jsonPath("$.size", is(size)));
+
+        verify(service, times(1)).getCacheDetails();
+    }
 }

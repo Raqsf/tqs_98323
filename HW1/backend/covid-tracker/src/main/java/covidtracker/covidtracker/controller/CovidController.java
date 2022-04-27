@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import covidtracker.covidtracker.model.CountryStats;
-import covidtracker.covidtracker.service.CacheService;
 import covidtracker.covidtracker.service.CovidService;
 
 /**
@@ -26,11 +27,10 @@ import covidtracker.covidtracker.service.CovidService;
 @RequestMapping("/api/v1")
 public class CovidController {
 
+    private static Logger logger = Logger.getLogger(CovidController.class.getName()); 
+    
     @Autowired
     private CovidService covidService;
-
-    // @Autowired
-    private CacheService cacheService;
 
     @GetMapping(value = {"/stats", "/stats/{country}"})
     public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) {
@@ -90,6 +90,7 @@ public class CovidController {
 
     @GetMapping("/cache/details")
     public ResponseEntity<Map<String, Object>> getCacheDetails() {
-        return ResponseEntity.ok(cacheService.getCacheDetails());
+        logger.log(Level.INFO, "getCacheDetails");
+        return ResponseEntity.ok(covidService.getCacheDetails());
     }
 }

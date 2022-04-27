@@ -13,6 +13,7 @@ public class Cache<K, V> {
     private Map<K, CacheItem<V>> map;
     private int hitCount;
     private int missCount;
+    private int requestCount;
     private final long timeToLive;
 
     private static Logger logger = Logger.getLogger(Cache.class.getName());
@@ -61,6 +62,7 @@ public class Cache<K, V> {
 
     public V get(K key) {
         synchronized (map) {
+            requestCount++;
             if(!map.containsKey(key)) {
                 missCount++;
                 return null;
@@ -88,6 +90,12 @@ public class Cache<K, V> {
     public int getMissCount() {
         synchronized (map) {
             return missCount;
+        }
+    }
+
+    public int getRequestCount() {
+        synchronized (map) {
+            return requestCount;
         }
     }
 
