@@ -26,8 +26,8 @@ public class CovidService {
     @Autowired
     private HttpRequests request;
 
-    @Autowired
-    private Cache cache;
+    // @Autowired
+    private Cache<String, CountryStats> cache = new Cache<>(300, 300);
 
     public Optional<CountryStats> getStatsByCountry(String country) {
         try {

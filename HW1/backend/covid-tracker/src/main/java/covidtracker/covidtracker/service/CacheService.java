@@ -12,8 +12,7 @@ import covidtracker.covidtracker.model.CountryStats;
 @Service
 public class CacheService {
 
-    @Autowired
-    private Cache<String, CountryStats> cache /* = new Cache(300, 300) */;
+    private Cache<String, CountryStats> cache = new Cache<>(300, 300);
 
     public Map<String, Object> getCacheDetails() {
         Map<String, Object> details = new HashMap<>();

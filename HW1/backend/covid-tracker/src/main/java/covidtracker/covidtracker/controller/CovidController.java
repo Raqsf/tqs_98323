@@ -29,7 +29,7 @@ public class CovidController {
     @Autowired
     private CovidService covidService;
 
-    @Autowired
+    // @Autowired
     private CacheService cacheService;
 
     @GetMapping(value = {"/stats", "/stats/{country}"})

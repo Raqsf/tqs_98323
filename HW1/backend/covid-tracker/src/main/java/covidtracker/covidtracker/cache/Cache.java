@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Cache<K, V> {
     private Map<K, CacheItem<V>> map;
     private int hitCount;
