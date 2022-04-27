@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Cache<K, V> {
-    private Map<K, CacheItem<K, V>> map;
+    private Map<K, CacheItem<V>> map;
     private int hitCount;
     private int missCount;
     private final long timeToLive;
@@ -46,7 +46,7 @@ public class Cache<K, V> {
     public void put(K key, V value) {
         synchronized (map) {
             logger.log(Level.INFO, "Putting new item in cache");
-            map.put(key, new CacheItem<>(key, value));
+            map.put(key, new CacheItem<>(value));
         }
     }
 
@@ -63,9 +63,8 @@ public class Cache<K, V> {
                 return null;
             }
 
-            CacheItem<K, V> node = map.get(key);
+            CacheItem<V> node = map.get(key);
             hitCount++;
-            node.incrementHitCount();
             node.setLastAccessed(System.currentTimeMillis());
             return node.getValue();
         }
@@ -102,9 +101,9 @@ public class Cache<K, V> {
 		synchronized (map) {
 			deleteKey = new ArrayList<>();
 			K key = null;
-			CacheItem<K, V> cacheItem = null;
+			CacheItem<V> cacheItem = null;
  
-			for(Map.Entry<K,CacheItem<K, V>> entry : map.entrySet()) {
+			for(Map.Entry<K,CacheItem<V>> entry : map.entrySet()) {
 				key = entry.getKey();
 				cacheItem= map.get(key);
  

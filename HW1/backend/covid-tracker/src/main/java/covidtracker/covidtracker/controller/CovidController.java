@@ -3,6 +3,7 @@ package covidtracker.covidtracker.controller;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import covidtracker.covidtracker.model.CountryStats;
+import covidtracker.covidtracker.service.CacheService;
 import covidtracker.covidtracker.service.CovidService;
 
 /**
@@ -26,6 +28,9 @@ public class CovidController {
 
     @Autowired
     private CovidService covidService;
+
+    @Autowired
+    private CacheService cacheService;
 
     @GetMapping(value = {"/stats", "/stats/{country}"})
     public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) {
@@ -81,5 +86,10 @@ public class CovidController {
         Optional<List<String>> result = covidService.getAllCountries();
 
         return result.isPresent() ? ResponseEntity.ok(result.get()) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping("/cache/details")
+    public ResponseEntity<Map<String, Object>> getCacheDetails() {
+        return ResponseEntity.ok(cacheService.getCacheDetails());
     }
 }

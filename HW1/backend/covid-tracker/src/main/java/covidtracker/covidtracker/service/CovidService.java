@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import covidtracker.covidtracker.cache.Cache;
 import covidtracker.covidtracker.model.CountryStats;
 import covidtracker.covidtracker.utils.HttpRequests;
 
@@ -24,6 +25,9 @@ public class CovidService {
 
     @Autowired
     private HttpRequests request;
+
+    @Autowired
+    private Cache cache;
 
     public Optional<CountryStats> getStatsByCountry(String country) {
         try {
