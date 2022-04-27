@@ -8,7 +8,7 @@ public class Cases extends Stats {
 
     // NOTE: new, active, critical and recovered can be null
 
-    public Cases(int newCases, int activeCases, int criticalCases, int recovered, int oneMPop, int totalCases) {
+    public Cases(int newCases, int activeCases, int criticalCases, int recovered, double oneMPop, int totalCases) {
         super(oneMPop, totalCases);
         this.newCases = newCases;
         this.activeCases = activeCases;

@@ -1,5 +1,7 @@
 package covidtracker.covidtracker.cache;
 
+import org.springframework.stereotype.Component;
+
 public class CacheItem<V> {
     private V value;
     private long lastAccessed;

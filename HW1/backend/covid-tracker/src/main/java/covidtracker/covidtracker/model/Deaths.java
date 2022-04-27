@@ -5,7 +5,7 @@ public class Deaths extends Stats {
 
     // NOTE: newDeaths can be null 
     
-    public Deaths(int newDeaths, int oneMPop, int totalCases) {
+    public Deaths(int newDeaths, double oneMPop, int totalCases) {
         super(oneMPop, totalCases);
         this.newDeaths = newDeaths;
     }

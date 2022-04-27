@@ -9,11 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -34,40 +31,25 @@ public class HttpRequests {
     private static final String BASE_URL = "https://covid-193.p.rapidapi.com";
 
     private static final String API_KEY = "f90020ba9dmsh31ec284026a13edp109b7djsn4ff85c39b60d";
+
+    private String charset = "UTF-8";
     
 
-    private JSONObject doRequest(String uri, Optional<Map<String, Object>> params) throws IOException, InterruptedException {
+    private JSONArray doRequest(String uri) throws IOException, InterruptedException {
 
         logger.log(Level.INFO, "Requesting to API ...");
 
-        HttpRequest request;
-
-        if(params.isPresent()) {
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            String requestBody = objectMapper.writeValueAsString(params);
-            
-            request = HttpRequest.newBuilder()
-            .uri(URI.create(uri))
-            .header("X-RapidAPI-Host", "covid-193.p.rapidapi.com")
-            .header("X-RapidAPI-Key", API_KEY)
-            .method("GET", HttpRequest.BodyPublishers.ofString(requestBody))
-            .build();
-
-        } else {
-
-            request = HttpRequest.newBuilder()
+        HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(uri))
             .header("X-RapidAPI-Host", "covid-193.p.rapidapi.com")
             .header("X-RapidAPI-Key", API_KEY)
             .method("GET", HttpRequest.BodyPublishers.noBody())
             .build();
-        }
 
         try {
 
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-            return new JSONObject(response.body());
+            return new JSONObject(response.body()).getJSONArray("response");
 
         } catch (InterruptedException e) {
             logger.log(Level.WARNING, e.getMessage());
@@ -81,13 +63,10 @@ public class HttpRequests {
     public CountryStats getCountryStats(String country) throws IOException, InterruptedException {
         logger.log(Level.INFO, "Get {0} stats", country);
 
-        String charset = "UTF-8";
         String query = String.format("/statistics?country=%s", URLEncoder.encode(country, charset));
 
         String url = BASE_URL + query;
-        JSONObject requestResponse = doRequest(url, Optional.empty());
-
-        JSONArray responseArray = requestResponse.getJSONArray("response");
+        JSONArray responseArray = doRequest(url);
 
         return getCountryStats(responseArray, 0);
     }
@@ -98,9 +77,7 @@ public class HttpRequests {
         String query = "/statistics";
 
         String url = BASE_URL + query;
-        JSONObject requestResponse = doRequest(url, Optional.empty());
-
-        JSONArray responseArray = requestResponse.getJSONArray("response");
+        JSONArray responseArray = doRequest(url);
 
         List<CountryStats> result = new ArrayList<>();
 
@@ -112,15 +89,13 @@ public class HttpRequests {
     }
 
     public List<CountryStats> getCountryHistory(String country) throws IOException, InterruptedException {
-        String query = "/history";
+        logger.log(Level.INFO, "Get {0}'s history", country);
+
+        String query = String.format("/history?country=%s", URLEncoder.encode(country, charset));
 
         String url = BASE_URL + query;
-        Map<String, Object> params = new HashMap<>();
-        params.put("country", country);
         
-        JSONObject requestResponse = doRequest(url, Optional.of(params));
-
-        JSONArray responseArray = requestResponse.getJSONArray("response");
+        JSONArray responseArray = doRequest(url);
 
         List<CountryStats> result = new ArrayList<>();
 
@@ -133,16 +108,12 @@ public class HttpRequests {
     }
 
     public List<CountryStats> getCountryHistoryByDay(String country, String date) throws IOException, InterruptedException {
-        String query = "/history";
+        String query = String.format("/history?country=%s&day=%s", URLEncoder.encode(country, charset), URLEncoder.encode(date, charset));
 
         String url = BASE_URL + query;
         Map<String, Object> params = new HashMap<>();
-        params.put("country", country);
-        params.put("date", date);
         
-        JSONObject requestResponse = doRequest(url, Optional.of(params));
-
-        JSONArray responseArray = requestResponse.getJSONArray("response");
+        JSONArray responseArray = doRequest(url);
 
         List<CountryStats> result = new ArrayList<>();
 
@@ -159,9 +130,7 @@ public class HttpRequests {
         String query = "/countries";
 
         String url = BASE_URL + query;
-        JSONObject requestResponse = doRequest(url, Optional.empty());
-
-        JSONArray responseArray = requestResponse.getJSONArray("response");
+        JSONArray responseArray = doRequest(url);
 
         List<String> result = new ArrayList<>();
 
@@ -180,9 +149,11 @@ public class HttpRequests {
         
         JSONObject responseJSON = responseArray.getJSONObject(index);
 
-        String continent = responseJSON.getString("continent");
+        logger.log(Level.INFO, "----------------- {0} ---", responseJSON.toString());
+
+        String continent = responseJSON.isNull("continent") ? "" : responseJSON.getString("continent");
         String countryName = responseJSON.getString("country");
-        int population = responseJSON.getInt("population");
+        int population = responseJSON.isNull("population") ? -1 : responseJSON.getInt("population");
         String day = responseJSON.getString("day");
         String time = responseJSON.getString("time");
 
@@ -191,14 +162,14 @@ public class HttpRequests {
         int activeCases = cases.isNull("active") ? -1 : cases.getInt("active");
         int criticalCases = cases.isNull("critical") ? -1 : cases.getInt("critical");
         int recoveredCases = cases.isNull("recovered") ? -1 : cases.getInt("recovered");
-        int oneMPopCases = cases.isNull("1M_pop") ? -1 : Integer.parseInt(cases.getString("1M_pop"));
+        double oneMPopCases = cases.isNull("1M_pop") ? -1 : Double.parseDouble(cases.getString("1M_pop"));
         int totalCases = cases.isNull("total") ? -1 : cases.getInt("total");
         JSONObject deaths = responseJSON.getJSONObject("deaths");
         int newDeaths = deaths.isNull("new") ? -1 : Integer.parseInt(deaths.getString("new").replace("+", ""));
-        int oneMPopDeaths = deaths.isNull("1M_pop") ? -1 : Integer.parseInt(deaths.getString("1M_pop"));
+        double oneMPopDeaths = deaths.isNull("1M_pop") ? -1 : Double.parseDouble(deaths.getString("1M_pop"));
         int totalDeaths = deaths.isNull("total") ? -1 : cases.getInt("total");
         JSONObject tests = responseJSON.getJSONObject("tests");
-        int oneMPopTests = tests.isNull("1M_pop") ? -1 : Integer.parseInt(tests.getString("1M_pop"));
+        double oneMPopTests = tests.isNull("1M_pop") ? -1 : Double.parseDouble(tests.getString("1M_pop"));
         int totalTests = tests.isNull("total") ? -1 : cases.getInt("total"); 
 
         Cases casesRes = new Cases(newCases, activeCases, criticalCases, recoveredCases, oneMPopCases, totalCases);

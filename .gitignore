@@ -15,3 +15,6 @@ buildNumber.properties
 ## VS Code
 */.vscode/*
 .vscode
+
+## React
+*/node_modules/

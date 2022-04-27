@@ -18,12 +18,11 @@ public class CacheTest{
 
     private Cache<String, CountryStats> cache;
     private long timeToLive = 1;
-    private long timeInterval = 1;
     private CountryStats stats;
 
     @BeforeEach
     public void setUp() {
-        cache = new Cache<>(timeToLive, timeInterval);
+        cache = new Cache<>(timeToLive);
         stats = new CountryStats("Europe", "Portugal", 10143368, new Cases(-1, -1, 61, -1, 366691, 3719485), new Deaths(-1, 2168, 21993), new Tests(4017243, 40748372), "2022-04-20", "2022-04-20T10:15:03+00:00");
     }
 

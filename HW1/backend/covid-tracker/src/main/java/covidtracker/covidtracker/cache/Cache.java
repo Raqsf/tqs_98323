@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,19 +19,21 @@ public class Cache<K, V> {
 
     private static Logger logger = Logger.getLogger(Cache.class.getName());
 
-    public Cache(long timeToLive, long timerInterval) {
+    // public Cache() {}
+
+    public Cache(@Value("${ttl}") Long timeToLive) {
         this.timeToLive = timeToLive * 1000;
         this.hitCount = 0;
         this.missCount = 0;
         map = new HashMap<>();
 
-        if (timeToLive > 0 && timerInterval > 0) {
+        if (timeToLive > 0) {
             
             Runnable runnable = () -> {
                 while (true) {
                     try {
 
-                        Thread.sleep(timerInterval * 1000);
+                        Thread.sleep(timeToLive);
                     } catch (InterruptedException ex) {
                         logger.log(Level.WARNING, "Interrupted!", ex);
                         // Restore interrupted state...

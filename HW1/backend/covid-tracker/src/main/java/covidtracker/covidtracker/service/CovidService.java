@@ -28,8 +28,7 @@ public class CovidService {
     @Autowired
     private HttpRequests request;
 
-    // @Autowired
-    private Cache<String, Object> cache = new Cache<>(300, 300);
+    private Cache<String, Object> cache = new Cache<>(300L);
 
     public Optional<CountryStats> getStatsByCountry(String country) {
         CountryStats cacheResult = (CountryStats) cache.get("/stats/" + country);
@@ -85,6 +84,7 @@ public class CovidService {
         if(cacheResult != null) {
             return Optional.of(cacheResult);
         }
+        
         try {
             List<CountryStats> result = request.getCountryHistory(country);
             cache.put("/history/" + country, result);

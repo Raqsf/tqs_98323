@@ -2,7 +2,7 @@ package covidtracker.covidtracker.model;
 
 public class Tests extends Stats {
     
-    public Tests(int oneMPop, int total) {
+    public Tests(double oneMPop, int total) {
         super(oneMPop, total);
     }
 }

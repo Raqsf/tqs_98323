@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import { styled, alpha, ThemeProvider } from '@mui/material/styles';
 import { 
   AppBar, 
   Box, 
@@ -12,6 +12,7 @@ import {
   MenuItem,
   InputBase 
 } from '@mui/material';
+import { theme } from '../App.js';
   
 
 const Search = styled('div')(({ theme }) => ({
@@ -57,8 +58,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['Products', 'Cache', 'Blog'];
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -72,7 +72,8 @@ const ResponsiveAppBar = () => {
   };
 
   return (
-    <AppBar position="static">
+    <ThemeProvider theme={theme}>
+    <AppBar position="static" color="primary">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -97,7 +98,7 @@ const ResponsiveAppBar = () => {
               color="inherit"
             >
                 
-              <i class="fa-solid fa-bars"></i>
+              <i className="fa-solid fa-bars"></i>
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -150,7 +151,7 @@ const ResponsiveAppBar = () => {
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             <Search>
               <SearchIconWrapper>
-                <i class="fa-solid fa-magnifying-glass"></i>
+                <i className="fa-solid fa-magnifying-glass"></i>
                 {/* <SearchIcon /> */}
               </SearchIconWrapper>
               <StyledInputBase
@@ -164,6 +165,7 @@ const ResponsiveAppBar = () => {
         </Toolbar>
       </Container>
     </AppBar>
+    </ThemeProvider>
   );
 };
 export default ResponsiveAppBar;

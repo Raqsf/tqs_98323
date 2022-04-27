@@ -60,6 +60,8 @@ public class CovidController {
         List<CountryStats> result;
 
         if(date.isEmpty()) {
+            logger.log(Level.INFO, "Controller: get all {0}'s history", country);
+            
             Optional<List<CountryStats>> countryStats = covidService.getHistory(country);
             if(countryStats.isPresent()) {
                 result = countryStats.get();

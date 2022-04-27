@@ -1,19 +1,17 @@
 package covidtracker.covidtracker.model;
 
 public class Stats {
-    private int oneMPop;     //cases per 1 million population
+    private double oneMPop;     //cases per 1 million population
     private int total;
 
     // NOTE: oneMPop and total can be null
 
-    public Stats(int oneMPop, int total) {
+    public Stats(double oneMPop, int total) {
         this.oneMPop = oneMPop;
         this.total = total;
     }
 
-    // public Stats() {}
-
-    public int getOneMPop() {
+    public double getOneMPop() {
         return oneMPop;
     }
 
