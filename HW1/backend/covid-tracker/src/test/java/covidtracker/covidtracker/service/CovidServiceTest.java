@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -247,6 +249,32 @@ public class CovidServiceTest {
         assertEquals(covidService.getAllCountries(), Optional.empty());
 
         verify(requests, times(1)).getCountries();
+
+    }
+
+    @Test
+    public void whenGetCacheDetails() {
+
+        when(cache.getHitCount()).thenReturn(1);
+        when(cache.getMissCount()).thenReturn(1);
+        when(cache.getRequestCount()).thenReturn(2);
+        when(cache.size()).thenReturn(1);
+        when(cache.getHitRatio()).thenReturn(0.5);
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("hits", 1);
+        res.put("misses", 1);
+        res.put("requests", 2);
+        res.put("size", 1);
+        res.put("hitRatio", 0.5);
+
+        assertEquals(covidService.getCacheDetails(), res);
+
+        verify(cache, times(1)).getHitCount();
+        verify(cache, times(1)).getMissCount();
+        verify(cache, times(1)).getRequestCount();
+        verify(cache, times(1)).size();
+        verify(cache, times(1)).getHitRatio();
 
     }
 
