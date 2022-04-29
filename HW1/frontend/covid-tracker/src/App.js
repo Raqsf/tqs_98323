@@ -10,15 +10,11 @@ export const theme = createTheme({
     primary: {
       main: '#41A3B3',
       contrastText: '#fff',
-      lighBlue: '#85DCBA',
+      coral: '#E27D60',
+      lightBlue: '#85DCBA',
       orange: '#E8A87C',
       pink: '#C38D9E'
     },
-    secondary: { 
-      // coral
-      main: '#E27D60',
-      contrastText: '#fff',
-    }
   },
 });
 
