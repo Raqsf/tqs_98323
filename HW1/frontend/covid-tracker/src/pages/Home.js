@@ -1,5 +1,7 @@
 import { useState, useEffect }from 'react';
-import { Grid, Typography, Paper, Box, LinearProgress, Button } from '@mui/material';
+import { Grid, Typography, Paper, Box, LinearProgress, Button, TextField } from '@mui/material';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../App.js';
 import Country from '../components/Country';
@@ -16,22 +18,24 @@ const Home = () => {
     const [isLoadedHist, setIsLoadedHist] = useState(false);
     const [itemsHist, setItemsHist] = useState([]);
     const [limit, setLimit] = useState(5);
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState(null);
 
-    const handleCountry = (value) => {
-        //console.log(value);
-        if(value !== "Global") {
-            setCountry(value);
+
+    const handleCountry = (countryName) => {
+        if(countryName !== "Global") {
+            setCountry(countryName);
         } else {
             setCountry('');
         }
 
-        value !== "Global" ? setIsSelected(true) : setIsSelected(false);
+        countryName !== "Global" ? setIsSelected(true) : setIsSelected(false);
         setIsLoaded(false);
       };
 
     const showMoreStats = () => {
-        setLimit(limit + 5);
+        if((limit < items.length && items.length <= limit + 5) || limit + 5 < items.length) {
+            setLimit(limit + 5);
+        }
     }
 
     const showLessStats = () => {
@@ -45,15 +49,32 @@ const Home = () => {
     const isToday = (someDateString) => {
         const someDate = new Date(someDateString)
         const today = new Date()
-        return someDate.getDate() == today.getDate() &&
-          someDate.getMonth() == today.getMonth() &&
-          someDate.getFullYear() == today.getFullYear()
+        return someDate.getDate() === today.getDate() &&
+          someDate.getMonth() === today.getMonth() &&
+          someDate.getFullYear() === today.getFullYear()
     }
 
     const toDate = (someDateString) => {
         const time = new Date(someDateString);
         return time.toLocaleString();
     }
+
+    const whereToSlice = () => {
+        return limit > items.length ? items.length : limit;
+    }
+
+    const getHistory = () => {
+        if(!isLoaded && !isLoadedHist) {
+            return <LinearProgress />;
+        }
+
+        if(date == null) {
+            return itemsHist.map((item,i) =>isToday(item.time) ?
+            <Box key={i}> <Typography>{toDate(item.time)}</Typography><Stats key={i} {...item}/></Box>
+            : "");
+        }
+        return itemsHist.map((item,i) => <Box key={i}> <Typography>{toDate(item.time)}</Typography><Stats key={i} {...item}/></Box>);
+    } 
 
     useEffect(() => {
         axios.get(`/stats/${country}`)
@@ -67,26 +88,20 @@ const Home = () => {
         })
     }, [country]);
 
-    /* console.log("XXXX " + country)
-    console.log(items) */
-
     useEffect(() => {
-        console.log("HERE")
         if(country.length > 0){
-            const url = date == "" ? `/history/${country}` : `/history/${country}&day=${date}`
+            const url = date == null ? `/history/${country}` : `/history/${country}?date=${date}`
             axios.get(url)
             .then(res => {
                 setIsLoadedHist(true);
                 setItemsHist(res.data);
-                console.log(res.data)
-                //console.log(isToday(res.data[0].time))
             })
             .catch(err => {
                 setIsLoadedHist(true);
                 setErrorHist(err);
             })
         }
-    }, [country]);
+    }, [country, date]);
 
     if (error) {
         return (
@@ -103,10 +118,7 @@ const Home = () => {
         </>
         );
     
-    } else {
-        //console.log(items.length)
-        //console.log(limit > items.length)
-        //console.log(itemsHist)
+    } 
 
     return (
         <>
@@ -130,7 +142,18 @@ const Home = () => {
                         >
                             COVID TRACKER
                         </Typography>
-                    </Grid>     
+                    </Grid>  
+
+                    <Grid item xs={3}>
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            component="div"
+                            style={{ color: "white" }}
+                        >
+                            Statistics
+                        </Typography>  
+                    </Grid> 
                 </Grid> 
             </ThemeProvider>
 
@@ -148,37 +171,55 @@ const Home = () => {
                 <Grid item xs={1} textAlign='center'>
                     <Paper 
                         elevation={2} 
-                        style={{ minWidth: '75vw', padding: 8, backgroundColor: "#F8F2E9" }}
+                        style={{ minWidth: '75vw', padding: 20, backgroundColor: "#F8F2E9" }}
                     >
                         <Typography variant="h6" component="span">
-                            TODAY'S INFO {isSelected ? `IN ${country.toUpperCase()}` : ``}
+                            CURRENT INFO
                         </Typography>
                         {!isLoaded ? <LinearProgress /> :
-                            items.slice(0,(limit > items.length ? items.length : limit)).map((item,i) => (<Box> <Stats key={i} {...item}/></Box>))
+                            items.slice(0,whereToSlice()).map((item,i) => (<Box key={i}> <Stats {...item}/></Box>))
                         }
-                        {isSelected ? "" : <Box><Button onClick={showMoreStats}>Show More</Button> <Button onClick={showLessStats}>Show Less</Button></Box>}
+                        {isSelected ? 
+                            "" : 
+                            <Box style={{ paddingTop: 20 }}>
+                                <Button onClick={showMoreStats}>Show More</Button> 
+                                <Button onClick={showLessStats}>Show Less</Button>
+                            </Box>
+                        }
                     </Paper>
                 </Grid>
+                {isSelected && !errorHist ?  
                 <Grid item xs={1} textAlign='center'>
                     <Paper 
                         elevation={2} 
-                        style={{ minWidth: '75vw', padding: 8, backgroundColor: "#F8F2E9" }}
+                        style={{ minWidth: '75vw', padding: 20, backgroundColor: "#F8F2E9" }}
                     >
                         <Typography variant="h6" component="span">
-                            {isSelected ? `${country.toUpperCase()}` : ``} HISTORY
+                            HISTORY 
                         </Typography>
-                        {!isLoaded ? <LinearProgress /> :
-                            itemsHist.slice(0,(limit > itemsHist.length ? itemsHist.length : limit)).map((item,i) => 
-                            isToday(item.time) ?
-                                (<Box> <Typography>{toDate(item.time)}</Typography><Stats key={i} {...item}/></Box>)
-                            : "")
-                        }
+                        <Box sx={{ m: 2 }}>
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                <DatePicker
+                                    label="Choose a day"
+                                    value={date}
+                                    maxDate={new Date()}
+                                    minDate={new Date("2019-01-01")}
+                                    onChange={(newValue) => {
+                                        const d = newValue.toISOString().substring(0, newValue.toISOString().indexOf("T"));
+                                        setDate(d);
+                                    }}
+                                    inputFormat="dd/MM/yyyy"
+                                    renderInput={(params) => <TextField {...params} />}
+                                />
+                            </LocalizationProvider>
+                        </Box>
+                        {getHistory()}
                     </Paper>
                 </Grid>
+                : ``}
             </Grid>
         </>
     );
-    }
 }
 
 export default Home;

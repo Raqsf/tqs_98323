@@ -3,6 +3,7 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ResponsiveAppBar from './components/ResponsiveAppBar';
 import Home from './pages/Home';
+import CacheInfo from './pages/CacheInfo';
 import { createTheme } from '@mui/material/styles';
 
 export const theme = createTheme({
@@ -25,6 +26,7 @@ function App() {
         <ResponsiveAppBar />
         <Routes>
           <Route path="/" exact element={<Home />}/>
+          <Route path="/cache" exact element={<CacheInfo />}/>
         </Routes>
       </Router>
     </>

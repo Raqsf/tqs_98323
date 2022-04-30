@@ -3,8 +3,15 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../App.js';
 
 const Stats = (props) => {
-    /* console.log('================================' + props.name)
-    console.log(props) */
+
+    const getResultInt = (arg, text) => {
+        return arg !== -1 ? <Typography variant="p"><b>{text}:</b> {arg}</Typography> : "";
+    }
+
+    const getResultDouble = (arg, text) => {
+        return arg !== -1.0 ? <Typography variant="p"><b>{text}:</b> {arg}</Typography> : "";
+    }
+
     if(!(props // 👈 null and undefined check
         && Object.keys(props).length === 0
         && Object.getPrototypeOf(props) === Object.prototype)
@@ -18,33 +25,33 @@ const Stats = (props) => {
                         <Typography variant="h6">Country's info</Typography>
                         <Typography variant="p"><b>Name:</b> {props.name}</Typography>
                         {props.continent !== "" ? <Typography variant="p"><b>Continent:</b> {props.continent}</Typography> : ""}
-                        {props.population !== -1 ? <Typography variant="p"><b>Population:</b> {props.population}</Typography>: ""}
+                        {getResultInt(props.population, "Population")}
                     </Paper>
                 </Grid>
                 <Grid item container direction="column" xs={3} textAlign='center'>
                     <Paper sx={{display: 'flex', flexDirection: 'column', p: 2, m: 1, bgcolor: "primary.orange"}} >
                     <Typography variant="h6">Cases</Typography>
-                    {props.cases.newCases != -1 ? <Typography variant="p"><b>New:</b> {props.cases.newCases}</Typography> : ""}
-                    {props.cases.activeCases != -1 ? <Typography variant="p"><b>Active:</b> {props.cases.activeCases}</Typography> : ""}
-                    {props.cases.criticalCases != -1 ? <Typography variant="p"><b>Critical:</b> {props.cases.criticalCases}</Typography> : ""}
-                    {props.cases.recoveredCases != -1 ? <Typography variant="p"><b>Recovered:</b> {props.cases.recoveredCases}</Typography> : ""}
-                    {props.cases.oneMPop != -1 ? <Typography variant="p"><b>Per 1 million pop:</b> {props.cases.oneMPop}</Typography> : ""}
-                    {props.cases.total != -1 ? <Typography variant="p"><b>Total:</b> {props.cases.total}</Typography> : ""}
+                    {getResultInt(props.cases.newCases, "New")}
+                    {getResultInt(props.cases.activeCases, "Active")}
+                    {getResultInt(props.cases.criticalCases, "Critical")}
+                    {getResultInt(props.cases.recovered, "Recovered")}
+                    {getResultDouble(props.cases.oneMPop, "Per 1 million pop")}
+                    {getResultInt(props.cases.total, "Total")}
                     </Paper>
                 </Grid>
                 <Grid item container direction="column" xs={3} textAlign='center'>
                     <Paper sx={{display: 'flex', flexDirection: 'column', p: 2, m: 1, bgcolor: "primary.main"}} >
                     <Typography variant="h6">Deaths</Typography>
-                    {props.deaths.newDeaths !== -1 ? <Typography variant="p"><b>New:</b> {props.deaths.newDeaths}</Typography> : ""}
-                    {props.deaths.oneMPop !== -1 ? <Typography variant="p"><b>Per 1 million pop:</b> {props.deaths.oneMPop}</Typography> : ""}
-                    {props.deaths.total !== -1 ? <Typography variant="p"><b>Total:</b> {props.deaths.total}</Typography> : ""}
+                    {getResultInt(props.deaths.newDeaths, "New")}
+                    {getResultDouble(props.deaths.oneMPop, "Per 1 million pop")}
+                    {getResultInt(props.deaths.total, "Total")}
                     </Paper>
                 </Grid>
                 <Grid item container direction="column" xs={3} textAlign='center'>
                     <Paper sx={{display: 'flex', flexDirection: 'column', p: 2, m: 1, bgcolor: "primary.pink"}} >
                     <Typography variant="h6">Tests</Typography>
-                    {props.tests.oneMPop !== -1 ? <Typography variant="p"><b>Per 1 million pop:</b> {props.tests.oneMPop}</Typography> : ""}
-                    {props.tests.total !== -1 ? <Typography variant="p"><b>Total:</b> {props.tests.total}</Typography> : ""}
+                    {getResultDouble(props.tests.oneMPop, "Per 1 million pop")}
+                    {getResultInt(props.tests.total, "Total")}
                     </Paper>
                 </Grid>
             </Grid>
