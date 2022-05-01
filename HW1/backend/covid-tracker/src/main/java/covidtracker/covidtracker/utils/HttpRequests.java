@@ -28,7 +28,7 @@ public class HttpRequests {
     private static final String API_KEY = "f90020ba9dmsh31ec284026a13edp109b7djsn4ff85c39b60d";
     
 
-    public JSONArray doRequest(String uri) throws IOException, InterruptedException {
+    public JSONArray doRequest(String uri) throws InterruptedException, IOException {
 
         logger.log(Level.INFO, "Requesting to API ...");
 
@@ -40,11 +40,10 @@ public class HttpRequests {
             .build();
 
         try {
-
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             return new JSONObject(response.body()).getJSONArray("response");
 
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             logger.log(Level.WARNING, e.getMessage());
 
             throw e;
