@@ -47,7 +47,7 @@ public class CovidService {
             cache.put("/stats/" + country, result);
             return Optional.of(result);
         } catch (IOException | InterruptedException e) {
-            logger.log(Level.WARNING, "SERVICE: {}", e.getMessage());
+            logger.log(Level.WARNING, e.getMessage());
 
             // Restore interrupted state...
             Thread.currentThread().interrupt();
@@ -68,7 +68,7 @@ public class CovidService {
             cache.put("/stats", result);
             return Optional.of(result);
         } catch (IOException | InterruptedException e) {
-            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            logger.log(Level.WARNING, e.getMessage());
             
             // Restore interrupted state...
             Thread.currentThread().interrupt();
@@ -78,7 +78,8 @@ public class CovidService {
     }
     
     public Optional<List<CountryStats>> getHistory(String country) {
-        List<CountryStats> cacheResult = (List<CountryStats>) cache.get("/history/" + country);
+        String cacheKey = "/history/" + country;
+        List<CountryStats> cacheResult = (List<CountryStats>) cache.get(cacheKey);
 
         if(cacheResult != null) {
             return Optional.of(cacheResult);
@@ -86,10 +87,10 @@ public class CovidService {
         
         try {
             List<CountryStats> result = getCountryHistory(country);
-            cache.put("/history/" + country, result);
+            cache.put(cacheKey, result);
             return Optional.of(result);
         } catch (IOException | InterruptedException e) {
-            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            logger.log(Level.WARNING, e.getMessage());
             
             // Restore interrupted state...
             Thread.currentThread().interrupt();
@@ -99,7 +100,8 @@ public class CovidService {
     }
 
     public Optional<List<CountryStats>> getHistory(String country, String date) {
-        List<CountryStats> cacheResult = (List<CountryStats>) cache.get("/history/" + country + "/" + date);
+        String cacheKey = "/history/" + country + "/" + date;
+        List<CountryStats> cacheResult = (List<CountryStats>) cache.get(cacheKey);
 
         if(cacheResult != null) {
             return Optional.of(cacheResult);
@@ -107,10 +109,10 @@ public class CovidService {
 
         try {
             List<CountryStats> result = getCountryHistoryByDay(country, date);
-            cache.put("/history/" + country + "/" + date, result);
+            cache.put(cacheKey, result);
             return Optional.of(result);
         } catch (IOException | InterruptedException e) {
-            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            logger.log(Level.WARNING, e.getMessage());
             
             // Restore interrupted state...
             Thread.currentThread().interrupt();
@@ -120,7 +122,8 @@ public class CovidService {
     }
 
     public Optional<List<String>> getAllCountries() {
-        List<String> cacheResult = (List<String>) cache.get("/countries");
+        String cacheKey = "/countries";
+        List<String> cacheResult = (List<String>) cache.get(cacheKey);
 
         if(cacheResult != null) {
             return Optional.of(cacheResult);
@@ -128,10 +131,10 @@ public class CovidService {
 
         try {
             List<String> result = getCountries();
-            cache.put("/countries", result);
+            cache.put(cacheKey, result);
             return Optional.of(result);
         } catch (IOException | InterruptedException e) {
-            logger.log(Level.WARNING, "SERVICE: {0}", e.getMessage());
+            logger.log(Level.WARNING, e.getMessage());
             
             // Restore interrupted state...
             Thread.currentThread().interrupt();

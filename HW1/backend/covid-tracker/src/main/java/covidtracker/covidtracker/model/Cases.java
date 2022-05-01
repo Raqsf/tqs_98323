@@ -6,7 +6,7 @@ public class Cases extends Stats {
     private int criticalCases;
     private int recovered;
 
-    // NOTE: new, active, critical and recovered can be null
+    // When there's no info about some statistic, it's value is -1
 
     public Cases(int newCases, int activeCases, int criticalCases, int recovered, double oneMPop, int totalCases) {
         super(oneMPop, totalCases);
@@ -15,16 +15,7 @@ public class Cases extends Stats {
         this.criticalCases = criticalCases;
         this.recovered = recovered;
     }
-/* 
-    public Cases(int criticalCases, int oneMPop, int totalCases) {
-        super(oneMPop, totalCases);
-        this.criticalCases = criticalCases;
-    }
 
-    public Cases(int oneMPop, int totalCases) {
-        super(oneMPop, totalCases);
-    }
- */
     public int getNewCases() {
         return newCases;
     }

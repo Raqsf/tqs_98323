@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.io.IOException;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +31,7 @@ public class HttpRequests {
 
     public JSONArray doRequest(String uri) throws InterruptedException, IOException {
 
-        logger.log(Level.INFO, "Requesting to API ...");
+        logger.log(Level.INFO, "Start request to API ...");
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(BASE_URL + uri))
@@ -40,16 +41,19 @@ public class HttpRequests {
             .build();
 
         try {
+            logger.log(Level.INFO, "Requesting to API ...");
+
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             return new JSONObject(response.body()).getJSONArray("response");
 
-        } catch (InterruptedException | IOException e) {
-            logger.log(Level.WARNING, e.getMessage());
+        } catch (InterruptedException | IOException | JSONException e) {
+
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
 
             throw e;
 
         }
-
     }
 
     public String getCountryName(JSONArray responseArray, int index) {
@@ -57,6 +61,8 @@ public class HttpRequests {
     }
 
     public CountryStats getCountryStats(JSONArray responseArray, int index) {
+        String oneMPop = "1M_pop";
+        String total = "total";
         
         JSONObject responseJSON = responseArray.getJSONObject(index);
 
@@ -71,15 +77,15 @@ public class HttpRequests {
         int activeCases = cases.isNull("active") ? -1 : cases.getInt("active");
         int criticalCases = cases.isNull("critical") ? -1 : cases.getInt("critical");
         int recoveredCases = cases.isNull("recovered") ? -1 : cases.getInt("recovered");
-        double oneMPopCases = cases.isNull("1M_pop") ? -1 : Double.parseDouble(cases.getString("1M_pop"));
-        int totalCases = cases.isNull("total") ? -1 : cases.getInt("total");
+        double oneMPopCases = cases.isNull(oneMPop) ? -1 : Double.parseDouble(cases.getString(oneMPop));
+        int totalCases = cases.isNull(total) ? -1 : cases.getInt(total);
         JSONObject deaths = responseJSON.getJSONObject("deaths");
         int newDeaths = deaths.isNull("new") ? -1 : Integer.parseInt(deaths.getString("new").replace("+", ""));
-        double oneMPopDeaths = deaths.isNull("1M_pop") ? -1 : Double.parseDouble(deaths.getString("1M_pop"));
-        int totalDeaths = deaths.isNull("total") ? -1 : cases.getInt("total");
+        double oneMPopDeaths = deaths.isNull(oneMPop) ? -1 : Double.parseDouble(deaths.getString(oneMPop));
+        int totalDeaths = deaths.isNull(total) ? -1 : cases.getInt(total);
         JSONObject tests = responseJSON.getJSONObject("tests");
-        double oneMPopTests = tests.isNull("1M_pop") ? -1 : Double.parseDouble(tests.getString("1M_pop"));
-        int totalTests = tests.isNull("total") ? -1 : cases.getInt("total"); 
+        double oneMPopTests = tests.isNull(oneMPop) ? -1 : Double.parseDouble(tests.getString(oneMPop));
+        int totalTests = tests.isNull(total) ? -1 : cases.getInt(total); 
 
         Cases casesRes = new Cases(newCases, activeCases, criticalCases, recoveredCases, oneMPopCases, totalCases);
         Deaths deathsRes = new Deaths(newDeaths, oneMPopDeaths, totalDeaths);

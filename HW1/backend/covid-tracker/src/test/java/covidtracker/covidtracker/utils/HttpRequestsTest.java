@@ -11,7 +11,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import covidtracker.covidtracker.model.Cases;
 import covidtracker.covidtracker.model.CountryStats;
+import covidtracker.covidtracker.model.Deaths;
+import covidtracker.covidtracker.model.Tests;
 
 class HttpRequestsTest {
 
@@ -33,7 +36,7 @@ class HttpRequestsTest {
     @Test
     void whenDoBadRequest() {
         // api doesn't have /stats endpoint
-        assertThrows(Exception.class, () -> httpRequests.doRequest("/stats"));
+        assertThrows(JSONException.class, () -> httpRequests.doRequest("/stats"));
     }
 
     @Test
@@ -80,6 +83,25 @@ class HttpRequestsTest {
         response.put(country);
 
         assertEquals(CountryStats.class, httpRequests.getCountryStats(response, 0).getClass());
-        assertEquals("Portugal", httpRequests.getCountryStats(response, 0).getName());
+        
+        CountryStats result = httpRequests.getCountryStats(response, 0);
+        Cases resultCases = result.getCases();
+        Deaths resultDeaths = result.getDeaths();
+        Tests resultTests = result.getTests();
+        
+        assertEquals("Portugal", result.getName());
+        assertEquals("Europe", result.getContinent());
+        assertEquals(10142964, result.getPopulation());
+        assertEquals(-1, resultCases.getNewCases());
+        assertEquals(-1, resultCases.getActiveCases());
+        assertEquals(61, resultCases.getCriticalCases());
+        assertEquals(-1, resultCases.getRecovered());
+        assertEquals(373830, resultCases.getOneMPop());
+        assertEquals(3791744, resultCases.getTotal());
+        assertEquals(-1, resultDeaths.getNewDeaths());
+        assertEquals(2185, resultDeaths.getOneMPop());
+        assertEquals(3791744, resultDeaths.getTotal());
+        assertEquals(4046001, resultTests.getOneMPop());
+        assertEquals(3791744, resultTests.getTotal());
     }
 }

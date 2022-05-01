@@ -10,6 +10,7 @@ public class CountryStats {
     private String day;
     private String time;
 
+    // When there's no info about some statistic, it's value is -1 or an empty String
 
     public CountryStats(String continent, String name, int population, Cases cases, Deaths deaths, Tests tests, String day, String time) {
         this.continent = continent;
@@ -21,8 +22,6 @@ public class CountryStats {
         this.day = day;
         this.time = time;
     }
-
-    // public CountryStats () {}
 
     public String getContinent() {
         return continent;

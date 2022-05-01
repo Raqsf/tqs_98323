@@ -34,17 +34,11 @@ public class CovidController {
 
     @GetMapping(value = {"/stats", "/stats/{country}"})
     public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) {
+        logger.log(Level.INFO, "Statistics");
 
         if(country.isPresent()) {
-            // SELECT no codigo, assim pessoas não podem escolher pais errado
-            // List<String> existsCountry = covidService.existCountry(country.get());
-
-            //if(existsCountry.isEmpty()) {
             Optional<CountryStats> result = covidService.getStatsByCountry(country.get());
             return result.isPresent() ? ResponseEntity.ok(Arrays.asList(result.get())) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
-            //} 
-
-            // return new ResponseEntity<>(Optional.of(existsCountry), HttpStatus.NOT_FOUND);
         }
 
         Optional<List<CountryStats>> result = covidService.getStats();
@@ -54,18 +48,18 @@ public class CovidController {
 
     @GetMapping("/history/{country}")
     public ResponseEntity<List<CountryStats>> getHistoryByCountry(@PathVariable("country") String country, @RequestParam Optional<String> date) {
-        // List<String> existsCountry = covidService.existCountry(country);
+        logger.log(Level.INFO, "History");
 
-        // if((existsCountry.isEmpty() || country.equalsIgnoreCase("all"))) {
         List<CountryStats> result;
 
         if(date.isEmpty()) {
-            logger.log(Level.INFO, "Controller: get all {0}'s history", country);
+            logger.log(Level.INFO, "Controller: get all {0}`s history", country);
             
             Optional<List<CountryStats>> countryStats = covidService.getHistory(country);
             if(countryStats.isPresent()) {
                 result = countryStats.get();
             } else {
+                logger.log(Level.WARNING, "Endpoint needs a country name");
                 return new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
             }
         } else {
@@ -73,17 +67,16 @@ public class CovidController {
             if(countryStats.isPresent()) {
                 result = countryStats.get();
             } else {
+                logger.log(Level.WARNING, "Endpoint needs a country name");
                 return new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
             }
         }
         return ResponseEntity.ok(result);
-        //} 
-
-        // return new ResponseEntity<>(Optional.of(existsCountry), HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/countries")
     public ResponseEntity<List<String>> getAllCountries() {
+        logger.log(Level.INFO, "Countries");
 
         Optional<List<String>> result = covidService.getAllCountries();
 
@@ -92,7 +85,7 @@ public class CovidController {
 
     @GetMapping("/cache/details")
     public ResponseEntity<Map<String, Object>> getCacheDetails() {
-        logger.log(Level.INFO, "getCacheDetails");
+        logger.log(Level.INFO, "Cache Details");
         return ResponseEntity.ok(covidService.getCacheDetails());
     }
 }

@@ -15,20 +15,20 @@ import covidtracker.covidtracker.model.CountryStats;
 import covidtracker.covidtracker.model.Deaths;
 import covidtracker.covidtracker.model.Tests;
 
-public class CacheTest{
+class CacheTest{
 
     private Cache<String, CountryStats> cache;
     private long timeToLive = 1;
     private CountryStats stats;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         cache = new Cache<>(timeToLive);
         stats = new CountryStats("Europe", "Portugal", 10143368, new Cases(-1, -1, 61, -1, 366691, 3719485), new Deaths(-1, 2168, 21993), new Tests(4017243, 40748372), "2022-04-20", "2022-04-20T10:15:03+00:00");
     }
 
     @Test
-    public void onConstruction() {
+    void onConstruction() {
         assertEquals(0, cache.size());
         assertEquals(0, cache.getHitCount());
         assertEquals(0, cache.getMissCount());
@@ -37,7 +37,7 @@ public class CacheTest{
     }
 
     @Test
-    public void whenPutItem() {
+    void whenPutItem() {
         cache.put("/stats/portugal", stats);
         assertEquals(1, cache.size());
         assertEquals(0, cache.getHitCount());
@@ -47,7 +47,7 @@ public class CacheTest{
     } 
 
     @Test
-    public void whenGetExistingItem() {
+    void whenGetExistingItem() {
         cache.put("/stats/portugal", stats);
         CountryStats result = cache.get("/stats/portugal");
         assertEquals(stats, result);
@@ -59,7 +59,7 @@ public class CacheTest{
     }
 
     @Test
-    public void whenGetNonExistingItem() {
+    void whenGetNonExistingItem() {
         cache.put("/stats/portugal", stats);
         CountryStats result = cache.get("/stats");
         assertEquals(null, result);
@@ -71,7 +71,7 @@ public class CacheTest{
     }
 
     @Test
-    public void whenDeletingExistingItem() {
+    void whenDeletingExistingItem() {
         cache.put("/stats/portugal", stats);
         int size = cache.size();
         cache.delete("/stats/portugal");
@@ -79,7 +79,7 @@ public class CacheTest{
     }
 
     @Test
-    public void whenDeletingNonExistingItem() {
+    void whenDeletingNonExistingItem() {
         cache.put("/stats/portugal", stats);
         int size = cache.size();
         cache.delete("/stats");
@@ -87,7 +87,7 @@ public class CacheTest{
     }
 
     @Test
-    public void whenExpired() throws InterruptedException {
+    void whenExpired() throws InterruptedException {
         cache.put("/stats/portugal", stats);
 
         await().atMost(Duration.ofSeconds(3)).until(isExpired());
@@ -100,7 +100,7 @@ public class CacheTest{
     }
 
     @Test
-    public void whenTimeToLiveLesserThanZero() {
+    void whenTimeToLiveLesserThanZero() {
         assertThrows(IllegalArgumentException.class, () -> new Cache<>(0L));
     }
     
