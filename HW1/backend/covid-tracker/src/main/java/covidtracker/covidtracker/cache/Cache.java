@@ -19,8 +19,6 @@ public class Cache<K, V> {
 
     private static Logger logger = Logger.getLogger(Cache.class.getName());
 
-    // public Cache() {}
-
     public Cache(@Value("${ttl}") Long timeToLive) {
         this.timeToLive = timeToLive * 1000;
         this.hitCount = 0;
@@ -47,7 +45,11 @@ public class Cache<K, V> {
 
 			t.setDaemon(true);
 			t.start();
+        } else {
+            logger.log(Level.WARNING, "Time to live must be greater than 0");
+            throw new IllegalArgumentException("Time to live must be greater than 0");
         }
+
     }
 
     public void put(K key, V value) {

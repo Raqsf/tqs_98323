@@ -1,6 +1,7 @@
 package covidtracker.covidtracker.cache;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
@@ -96,6 +97,11 @@ public class CacheTest{
 
     private Callable<Boolean> isExpired() {
         return () -> cache.size() == 0;
+    }
+
+    @Test
+    public void whenTimeToLiveLesserThanZero() {
+        assertThrows(IllegalArgumentException.class, () -> new Cache<>(0L));
     }
     
 }

@@ -1,6 +1,9 @@
 package covidtracker.covidtracker.controller;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,7 +33,7 @@ import covidtracker.covidtracker.model.Tests;
 import covidtracker.covidtracker.service.CovidService;
 
 @WebMvcTest(CovidController.class)
-public class CovidControllerTest {
+class CovidControllerTest {
 
     private CountryStats stats;
 
@@ -72,9 +75,8 @@ public class CovidControllerTest {
     }
 
     @Test
-    public void whenGetStatsByCountry() throws Exception {
+    void whenGetStatsByCountry() throws Exception {
 
-        // when(service.existCountry(country)).thenReturn(Collections.emptyList());
         when(service.getStatsByCountry(stats.getName())).thenReturn(Optional.of(stats));
 
         mvc.perform(
@@ -86,56 +88,46 @@ public class CovidControllerTest {
             //.andExpect(jsonPath("$parameters.country", is(country)))
             //.andExpect(jsonPath("$response[0].continent", is(stats.getContinent())))
             .andExpect(jsonPath("$[0].continent", is(stats.getContinent())))
-            .andExpect(jsonPath("$[0].name", is(stats.getName())));
+            .andExpect(jsonPath("$[0].name", is(stats.getName())))
+            .andExpect(jsonPath("$[0].population", is(stats.getPopulation())))
+            .andExpect(jsonPath("$[0].day", is(stats.getDay())))
+            .andExpect(jsonPath("$[0].time", is(stats.getTime())))
+            .andExpect(jsonPath("$[0].cases.*", hasSize(6)))
+            .andExpect(jsonPath("$[0].deaths.*", hasSize(3)))
+            .andExpect(jsonPath("$[0].tests.*", hasSize(2)));
         
-        // verify(service, times(1)).existCountry(country);
         verify(service, times(1)).getStatsByCountry(stats.getName());
     }
 
     @Test
-    public void whenGetStatsByCountry_SomethingWrong() throws Exception {
+    void whenGetStatsByCountry_SomethingWrong() throws Exception {
 
-        // when(service.existCountry(country)).thenReturn(Collections.emptyList());
         when(service.getStatsByCountry(stats.getName())).thenReturn(Optional.empty());
 
         mvc.perform(
             get("/api/v1/stats/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
         
-        // verify(service, times(1)).existCountry(country);
         verify(service, times(1)).getStatsByCountry(stats.getName());
     }
 
-   /*  @Test
-    public void whenGetStatsByCountryWrongName() throws Exception {
-        String country = "port";
-        List<String> res = new ArrayList<String>();
-        res.add("Country " + country +  " doesn't exist");
-
-        when(service.existCountry(country)).thenReturn(res);
-
-        mvc.perform(
-            get("/api/v1/stats/{country}", country).contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
-        
-        verify(service, times(1)).existCountry(country);
-    } */
-
     @Test
-    public void whenGetAllStats() throws Exception {
-        List<CountryStats> allStats = Arrays.asList(stats);
+    void whenGetAllStats() throws Exception {
+        List<CountryStats> allStats = Arrays.asList(stats, stats);
 
         when(service.getStats()).thenReturn(Optional.of(allStats));
 
         mvc.perform(
             get("/api/v1/stats").contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(greaterThan(1))));
+            // hasSize(greaterThan(1))
 
         verify(service, times(1)).getStats();
     }
 
     @Test
-    public void whenGetAllStats_SomethingWrong() throws Exception {
+    void whenGetAllStats_SomethingWrong() throws Exception {
         
         when(service.getStats()).thenReturn(Optional.empty());
 
@@ -147,7 +139,7 @@ public class CovidControllerTest {
     }
 
     @Test
-    public void whenGetHistory() throws Exception {
+    void whenGetHistory() throws Exception {
 
         List<CountryStats> history = Arrays.asList(stats, stats);
         when(service.getHistory(stats.getName())).thenReturn(Optional.of(history));
@@ -155,13 +147,14 @@ public class CovidControllerTest {
         mvc.perform(
             get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(greaterThan(1))))
             .andExpect(jsonPath("$[0].name", is(stats.getName())));
 
         verify(service, times(1)).getHistory(stats.getName());
     }
 
     @Test
-    public void whenGetHistory_SomethingWrong() throws Exception {
+    void whenGetHistory_SomethingWrong() throws Exception {
 
         when(service.getHistory(stats.getName())).thenReturn(Optional.empty());
 
@@ -173,7 +166,7 @@ public class CovidControllerTest {
     }
 
     @Test
-    public void whenGetHistoryWithDate() throws Exception {
+    void whenGetHistoryWithDate() throws Exception {
 
         List<CountryStats> history = Arrays.asList(stats, stats);
 
@@ -183,13 +176,14 @@ public class CovidControllerTest {
             get("/api/v1/history/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON).param("date", stats.getDay()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].day", is(stats.getDay())))
-            .andExpect(jsonPath("$[0].name", is(stats.getName())));
+            .andExpect(jsonPath("$[0].name", is(stats.getName())))
+            .andExpect(jsonPath("$[0].time", containsString(stats.getTime())));
 
         verify(service, times(1)).getHistory(stats.getName(), stats.getDay());
     }
 
     @Test
-    public void whenGetHistoryWithDate_SomethingWrong() throws Exception {
+    void whenGetHistoryWithDate_SomethingWrong() throws Exception {
 
         when(service.getHistory(stats.getName(), stats.getDay())).thenReturn(Optional.empty());
 
@@ -201,7 +195,7 @@ public class CovidControllerTest {
     }
 
     @Test
-    public void whenGetAllCountries() throws Exception {
+    void whenGetAllCountries() throws Exception {
 
         when(service.getAllCountries()).thenReturn(Optional.of(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra")));
 
@@ -217,7 +211,7 @@ public class CovidControllerTest {
     }    
 
     @Test
-    public void whenGetAllCountries_SomethingWrong() throws Exception {
+    void whenGetAllCountries_SomethingWrong() throws Exception {
 
         when(service.getAllCountries()).thenReturn(Optional.empty());
 
@@ -229,7 +223,7 @@ public class CovidControllerTest {
     }  
 
     @Test
-    public void whenGetCacheDetails() throws Exception {
+    void whenGetCacheDetails() throws Exception {
         int hit = 0, miss = 1, request = 1, size = 1;
         double hitRatio = 1;
 

@@ -1,21 +1,27 @@
 package covidtracker.covidtracker.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import covidtracker.covidtracker.cache.Cache;
@@ -26,7 +32,7 @@ import covidtracker.covidtracker.model.Tests;
 import covidtracker.covidtracker.utils.HttpRequests;
 
 @ExtendWith(MockitoExtension.class)
-public class CovidServiceTest {
+class CovidServiceTest {
 
     @Mock( lenient = true)
     private HttpRequests requests;
@@ -39,10 +45,57 @@ public class CovidServiceTest {
 
     private CountryStats stats;
 
+    private JSONArray response;
+
+    private JSONArray responseArray;
+
+    private JSONArray countriesNameResponse;
+
     @BeforeEach
-    private void setUp() {
+    private void setUp() throws JSONException {
         stats = new CountryStats("Europe", "Portugal", 10142964, new Cases(-1, -1, 61, -1, 373830, 3791744), 
                     new Deaths(-1, 2185, 3791744), new Tests(4046001, 3791744), "2022-04-25", "2022-04-25T18:15:04+00:00");
+        
+        JSONObject cases = new JSONObject();
+        cases.put("oneMPop", 373830);
+        cases.put("total", 3791744);
+        cases.put("newCases", -1);
+        cases.put("activeCases", -1);
+        cases.put("criticalCases", 61);
+        cases.put("recovered", -1);
+
+        JSONObject deaths = new JSONObject();
+        deaths.put("oneMPop", 2185);
+        deaths.put("total", 3791744);
+        deaths.put("newDeaths", -1);
+
+        JSONObject tests = new JSONObject();
+        tests.put("oneMPop", 4046001);
+        tests.put("total", 3791744);
+
+        JSONObject country = new JSONObject();
+        country.put("continent", "Europe");
+        country.put("name", "Portugal");
+        country.put("population", 10142964);
+        country.put("day", "2022-04-25");
+        country.put("time", "2022-04-25T18:15:04+00:00");
+        country.put("cases", cases);
+        country.put("deaths", deaths);
+        country.put("tests", tests);
+
+        response = new JSONArray();
+        response.put(country);
+
+        responseArray = new JSONArray();
+        responseArray.put(country);
+        responseArray.put(country);
+
+        countriesNameResponse = new JSONArray();
+        countriesNameResponse.put("Afghanistan");
+        countriesNameResponse.put("Albania");
+        countriesNameResponse.put("Algeria");
+        countriesNameResponse.put("Andorra");
+
         /* {
             "continent": "Europe",
             "name": "Portugal",
@@ -70,45 +123,44 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetStatsByCountry_InCache() throws IOException, InterruptedException {
+    void whenGetStatsByCountry_InCache() throws IOException, InterruptedException {
 
         when(cache.get("/stats/portugal")).thenReturn(stats);
-        //when(requests.getCountryStats("portugal")).thenReturn(stats);
 
         assertEquals(covidService.getStatsByCountry("portugal"), Optional.of(stats));
 
         verify(cache, times(1)).get("/stats/portugal");
-        // verify(requests, times(1)).doRequest(Mockito.any());
     }
 
     @Test
-    public void whenGetStatsByCountry_NotInCache() throws IOException, InterruptedException {
+    void whenGetStatsByCountry_NotInCache() throws IOException, InterruptedException {
 
         when(cache.get("/stats/portugal")).thenReturn(null);
-        when(requests.getCountryStats("portugal")).thenReturn(stats);
+        when(requests.doRequest("/statistics?country=portugal")).thenReturn(response);
+        when(requests.getCountryStats(response, 0)).thenReturn(stats);
 
         assertEquals(covidService.getStatsByCountry("portugal"), Optional.of(stats));
 
         verify(cache, times(1)).get("/stats/portugal");
-        verify(requests, times(1)).getCountryStats("portugal");
+        verify(requests, times(1)).doRequest("/statistics?country=portugal");
+        verify(requests, times(1)).getCountryStats(response, 0);
         verify(cache, times(1)).put("/stats/portugal", stats);
-        // verify(requests, times(1)).doRequest(Mockito.any());
     }
 
     @Test
-    public void whenGetStatsByCountry_SomethingWrong() throws IOException, InterruptedException {
+    void whenGetStatsByCountry_SomethingWrong() throws IOException, InterruptedException {
 
-        when(requests.getCountryStats("portugal")).thenThrow(IOException.class);
+        when(cache.get("/stats/portugal")).thenReturn(null);
+        when(requests.doRequest("/statistics?country=portugal")).thenThrow(IOException.class);
 
-        //assertThrows(IOException.class, () -> covidService.getStatsByCountry("portugal"));
         assertEquals(covidService.getStatsByCountry("portugal"), Optional.empty());
 
-        verify(requests, times(1)).getCountryStats("portugal");
-        // verify(requests, times(1)).doRequest(Mockito.any());
+        verify(cache, times(1)).get("/stats/portugal");
+        verify(requests, times(1)).doRequest("/statistics?country=portugal");
     }
 
     @Test
-    public void whenGetStatsAllCountries_InCache() throws IOException, InterruptedException {
+    void whenGetStatsAllCountries_InCache() throws IOException, InterruptedException {
 
         when(cache.get("/stats")).thenReturn(Arrays.asList(stats, stats));
 
@@ -118,30 +170,34 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetStatsAllCountries_NotInCache() throws IOException, InterruptedException {
+    void whenGetStatsAllCountries_NotInCache() throws IOException, InterruptedException {
 
         when(cache.get("/stats")).thenReturn(null);
-        when(requests.getAllCountryStats()).thenReturn(Arrays.asList(stats, stats));
+        when(requests.doRequest("/statistics")).thenReturn(responseArray);
+        when(requests.getCountryStats(eq(responseArray), Mockito.anyInt())).thenReturn(stats);
 
         assertEquals(covidService.getStats(), Optional.of(Arrays.asList(stats, stats)));
 
         verify(cache, times(1)).get("/stats");
-        verify(requests, times(1)).getAllCountryStats();
+        verify(requests, times(1)).doRequest("/statistics");
+        verify(requests, times(responseArray.length())).getCountryStats(eq(responseArray), Mockito.anyInt());
         verify(cache, times(1)).put("/stats", Arrays.asList(stats, stats));
     }
 
     @Test
-    public void whenGetStatsAllCountries_SomethingWrong() throws IOException, InterruptedException {
+    void whenGetStatsAllCountries_SomethingWrong() throws IOException, InterruptedException {
 
-        when(requests.getAllCountryStats()).thenThrow(IOException.class);
+        when(cache.get("/stats")).thenReturn(null);
+        when(requests.doRequest("/statistics")).thenThrow(IOException.class);
 
         assertEquals(covidService.getStats(), Optional.empty());
 
-        verify(requests, times(1)).getAllCountryStats();
+        verify(cache, times(1)).get("/stats");
+        verify(requests, times(1)).doRequest("/statistics");
     }
 
     @Test
-    public void whenGetCountryHistory_InCache() throws IOException, InterruptedException {
+    void whenGetCountryHistory_InCache() throws IOException, InterruptedException {
         
         CountryStats newStats = stats;
         newStats.setTime("2022-04-25T18:30:04+00:00");
@@ -154,33 +210,37 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetCountryHistory_NotInCache() throws IOException, InterruptedException {
+    void whenGetCountryHistory_NotInCache() throws IOException, InterruptedException {
         
         CountryStats newStats = stats;
         newStats.setTime("2022-04-25T18:30:04+00:00");
 
         when(cache.get("/history/" + stats.getName())).thenReturn(null);
-        when(requests.getCountryHistory(stats.getName())).thenReturn(Arrays.asList(stats, newStats));
+        when(requests.doRequest("/history?country=" + stats.getName())).thenReturn(responseArray);
+        when(requests.getCountryStats(eq(responseArray), Mockito.anyInt())).thenReturn(stats);
 
         assertEquals(covidService.getHistory(stats.getName()), Optional.of(Arrays.asList(stats, newStats)));
 
         verify(cache, times(1)).get("/history/" + stats.getName());
-        verify(requests, times(1)).getCountryHistory(stats.getName());
-        verify(cache, times(1)).put("/history/" + stats.getName(), Arrays.asList(stats, newStats));
+        verify(requests, times(1)).doRequest("/history?country=" + stats.getName());
+        verify(requests, times(responseArray.length())).getCountryStats(eq(responseArray), Mockito.anyInt());
+        verify(cache, times(1)).put("/history/" + stats.getName(), Arrays.asList(stats, stats));
     }
 
     @Test
-    public void whenGetCountryHistory_SomethingWrong() throws IOException, InterruptedException {
+    void whenGetCountryHistory_SomethingWrong() throws IOException, InterruptedException {
         
-        when(requests.getCountryHistory(stats.getName())).thenThrow(IOException.class);
+        when(cache.get("/history/" + stats.getName())).thenReturn(null);
+        when(requests.doRequest("/history?country=" + stats.getName())).thenThrow(IOException.class);
 
         assertEquals(covidService.getHistory(stats.getName()), Optional.empty());
 
-        verify(requests, times(1)).getCountryHistory(stats.getName());
+        verify(cache, times(1)).get("/history/" + stats.getName());
+        verify(requests, times(1)).doRequest("/history?country=" + stats.getName());
     }
 
     @Test
-    public void whenGetCountryHistoryByDay_InCache() throws IOException, InterruptedException {
+    void whenGetCountryHistoryByDay_InCache() throws IOException, InterruptedException {
         CountryStats newStats = stats;
         newStats.setTime("2022-04-25T18:30:04+00:00");
 
@@ -192,33 +252,37 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetCountryHistoryByDay_NotInCache() throws IOException, InterruptedException {
+    void whenGetCountryHistoryByDay_NotInCache() throws IOException, InterruptedException {
         CountryStats newStats = stats;
         newStats.setTime("2022-04-25T18:30:04+00:00");
 
         when(cache.get("/history/" + stats.getName() + "/" + stats.getDay())).thenReturn(null);
-        when(requests.getCountryHistoryByDay(stats.getName(), stats.getDay())).thenReturn(Arrays.asList(stats, newStats));
+        when(requests.doRequest("/history?country=" + stats.getName() +"&day=" + stats.getDay())).thenReturn(responseArray);
+        when(requests.getCountryStats(eq(responseArray), Mockito.anyInt())).thenReturn(stats);
 
-        assertEquals(covidService.getHistory(stats.getName(), stats.getDay()), Optional.of(Arrays.asList(stats, newStats)));
+        assertEquals(covidService.getHistory(stats.getName(), stats.getDay()), Optional.of(Arrays.asList(stats, stats)));
 
         verify(cache, times(1)).get("/history/" + stats.getName() + "/" + stats.getDay());
-        verify(requests, times(1)).getCountryHistoryByDay(stats.getName(), stats.getDay());
-        verify(cache, times(1)).put("/history/" + stats.getName() + "/" + stats.getDay(), Arrays.asList(stats, newStats));
+        verify(requests, times(1)).doRequest("/history?country=" + stats.getName() +"&day=" + stats.getDay());
+        verify(requests, times(responseArray.length())).getCountryStats(eq(responseArray), Mockito.anyInt());
+        verify(cache, times(1)).put("/history/" + stats.getName() + "/" + stats.getDay(), Arrays.asList(stats, stats));
     }
 
 
     @Test
-    public void whenGetCountryHistoryByDay_SomethingWrong() throws IOException, InterruptedException {
+    void whenGetCountryHistoryByDay_SomethingWrong() throws IOException, InterruptedException {
         
-        when(requests.getCountryHistoryByDay(stats.getName(), stats.getDay())).thenThrow(IOException.class);
+        when(cache.get("/history/" + stats.getName() + "/" + stats.getDay())).thenReturn(null);
+        when(requests.doRequest("/history?country=" + stats.getName() +"&day=" + stats.getDay())).thenThrow(IOException.class);
 
         assertEquals(covidService.getHistory(stats.getName(), stats.getDay()), Optional.empty());
 
-        verify(requests, times(1)).getCountryHistoryByDay(stats.getName(), stats.getDay());
+        verify(cache, times(1)).get("/history/" + stats.getName() + "/" + stats.getDay());
+        verify(requests, times(1)).doRequest("/history?country=" + stats.getName() +"&day=" + stats.getDay());
     }
 
     @Test
-    public void whenGetAllCountries_InCache() throws IOException, InterruptedException {
+    void whenGetAllCountries_InCache() throws IOException, InterruptedException {
 
         when(cache.get("/countries")).thenReturn(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
 
@@ -229,31 +293,37 @@ public class CovidServiceTest {
     }
 
     @Test
-    public void whenGetAllCountries_NotInCache() throws IOException, InterruptedException {
+    void whenGetAllCountries_NotInCache() throws IOException, InterruptedException, JSONException {
 
-        when(cache.get("/countires")).thenReturn(null);
-        when(requests.getCountries()).thenReturn(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
-
+        when(cache.get("/countries")).thenReturn(null);
+        when(requests.doRequest("/countries")).thenReturn(countriesNameResponse);
+        for(int i = 0; i < countriesNameResponse.length(); i++) {
+            when(requests.getCountryName(countriesNameResponse, i)).thenReturn(countriesNameResponse.getString(i));
+        }
+        
         assertEquals(covidService.getAllCountries(), Optional.of(Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra")));
 
         verify(cache, times(1)).get("/countries");
-        verify(requests, times(1)).getCountries();
+        verify(requests, times(1)).doRequest("/countries");
+        verify(requests, times(countriesNameResponse.length())).getCountryName(eq(countriesNameResponse), Mockito.anyInt());
         verify(cache, times(1)).put("/countries", Arrays.asList("Afghanistan", "Albania", "Algeria", "Andorra"));
     }
 
     @Test
-    public void whenGetAllCountries_SomethingWrong() throws IOException, InterruptedException {
+    void whenGetAllCountries_SomethingWrong() throws IOException, InterruptedException {
 
-        when(requests.getCountries()).thenThrow(IOException.class);
+        when(cache.get("/countries")).thenReturn(null);
+        when(requests.doRequest("/countries")).thenThrow(IOException.class);
 
         assertEquals(covidService.getAllCountries(), Optional.empty());
 
-        verify(requests, times(1)).getCountries();
+        verify(cache, times(1)).get("/countries");
+        verify(requests, times(1)).doRequest("/countries");
 
     }
 
     @Test
-    public void whenGetCacheDetails() {
+    void whenGetCacheDetails() {
 
         when(cache.getHitCount()).thenReturn(1);
         when(cache.getMissCount()).thenReturn(1);

@@ -1,14 +1,9 @@
 package covidtracker.covidtracker.utils;
 
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,16 +26,14 @@ public class HttpRequests {
     private static final String BASE_URL = "https://covid-193.p.rapidapi.com";
 
     private static final String API_KEY = "f90020ba9dmsh31ec284026a13edp109b7djsn4ff85c39b60d";
-
-    private String charset = "UTF-8";
     
 
-    private JSONArray doRequest(String uri) throws IOException, InterruptedException {
+    public JSONArray doRequest(String uri) throws IOException, InterruptedException {
 
         logger.log(Level.INFO, "Requesting to API ...");
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(uri))
+            .uri(URI.create(BASE_URL + uri))
             .header("X-RapidAPI-Host", "covid-193.p.rapidapi.com")
             .header("X-RapidAPI-Key", API_KEY)
             .method("GET", HttpRequest.BodyPublishers.noBody())
@@ -60,96 +53,13 @@ public class HttpRequests {
 
     }
 
-    public CountryStats getCountryStats(String country) throws IOException, InterruptedException {
-        logger.log(Level.INFO, "Get {0} stats", country);
-
-        String query = String.format("/statistics?country=%s", URLEncoder.encode(country, charset));
-
-        String url = BASE_URL + query;
-        JSONArray responseArray = doRequest(url);
-
-        return getCountryStats(responseArray, 0);
-    }
-
-    public List<CountryStats> getAllCountryStats() throws IOException, InterruptedException {
-        logger.log(Level.INFO, "Get all stats");
-
-        String query = "/statistics";
-
-        String url = BASE_URL + query;
-        JSONArray responseArray = doRequest(url);
-
-        List<CountryStats> result = new ArrayList<>();
-
-        for(int i = 0; i < responseArray.length(); i++) {
-            result.add(getCountryStats(responseArray, i));
-        }
-
-        return result;
-    }
-
-    public List<CountryStats> getCountryHistory(String country) throws IOException, InterruptedException {
-        logger.log(Level.INFO, "Get {0}'s history", country);
-
-        String query = String.format("/history?country=%s", URLEncoder.encode(country, charset));
-
-        String url = BASE_URL + query;
-        
-        JSONArray responseArray = doRequest(url);
-
-        List<CountryStats> result = new ArrayList<>();
-
-        for(int i = 0; i < responseArray.length(); i++) {
-            result.add(getCountryStats(responseArray, i));
-        }
-
-        return result;
-        
-    }
-
-    public List<CountryStats> getCountryHistoryByDay(String country, String date) throws IOException, InterruptedException {
-        String query = String.format("/history?country=%s&day=%s", URLEncoder.encode(country, charset), URLEncoder.encode(date, charset));
-
-        String url = BASE_URL + query;
-        Map<String, Object> params = new HashMap<>();
-        
-        JSONArray responseArray = doRequest(url);
-
-        List<CountryStats> result = new ArrayList<>();
-
-        for(int i = 0; i < responseArray.length(); i++) {
-            result.add(getCountryStats(responseArray, i));
-        }
-
-        return result;
-    }
-
-    public List<String> getCountries() throws IOException, InterruptedException {
-        logger.log(Level.INFO, "Get countries");
-
-        String query = "/countries";
-
-        String url = BASE_URL + query;
-        JSONArray responseArray = doRequest(url);
-
-        List<String> result = new ArrayList<>();
-
-        for(int i = 0; i < responseArray.length(); i++) {
-            result.add(getCountryName(responseArray, i));
-        }
-
-        return result;
-    }
-
-    private String getCountryName(JSONArray responseArray, int index) {
+    public String getCountryName(JSONArray responseArray, int index) {
         return responseArray.getString(index);
     }
 
-    private CountryStats getCountryStats(JSONArray responseArray, int index) {
+    public CountryStats getCountryStats(JSONArray responseArray, int index) {
         
         JSONObject responseJSON = responseArray.getJSONObject(index);
-
-        logger.log(Level.INFO, "----------------- {0} ---", responseJSON.toString());
 
         String continent = responseJSON.isNull("continent") ? "" : responseJSON.getString("continent");
         String countryName = responseJSON.getString("country");
