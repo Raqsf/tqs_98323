@@ -40,10 +40,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Raqsf_tqs_98323 --file HW1/backend/covid-tracker/pom.xml
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Raqsf_tqs_98323 --file HW1/backend/covid-tracker/pom.xml -Dtest=!CucumberTest
   
   build:
-    name: Build Spring
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -57,4 +57,4 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Maven
-      run: mvn -B package --file HW1/backend/covid-tracker/pom.xml
+      run: mvn -B package --file HW1/backend/covid-tracker/pom.xml -Dtest=!CucumberTest
