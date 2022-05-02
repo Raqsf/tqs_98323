@@ -43,7 +43,7 @@ jobs:
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Raqsf_tqs_98323 --file HW1/backend/covid-tracker/pom.xml
   
   build:
-    name: Build
+    name: Build Spring
     runs-on: ubuntu-latest
 
     steps:
