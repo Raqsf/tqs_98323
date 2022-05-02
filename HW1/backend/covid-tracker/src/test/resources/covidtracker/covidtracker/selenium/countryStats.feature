@@ -6,7 +6,7 @@ Feature: Search COVID-19 statistics
         Then the recovered cases should be greater than or equal to 467514901
         Then the first country should be 'Afghanistan'
     
-    Scenario: See current Andorra's statistics and history at octover 6th of 2021
+    Scenario: See current Andorra's statistics and history at october 6th of 2021
         When user navigates to the covid tracker application
         And user selects 'Andorra'
         And selects 06/10/2021

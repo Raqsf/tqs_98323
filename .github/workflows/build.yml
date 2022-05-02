@@ -12,7 +12,8 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  reatc:
+  react:
+    name: React
     runs-on: ubuntu-latest
 
     strategy:
@@ -27,10 +28,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-    
+    - run: npm ci --prefix HW1/frontend/covid-tracker
+    - run: npm run build --if-present --prefix HW1/frontend/covid-tracker
+    - run: npm test --prefix HW1/frontend/covid-tracker
+
   sonar:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
