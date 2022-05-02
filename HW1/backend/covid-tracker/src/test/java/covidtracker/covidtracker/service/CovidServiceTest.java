@@ -95,31 +95,6 @@ class CovidServiceTest {
         countriesNameResponse.put("Albania");
         countriesNameResponse.put("Algeria");
         countriesNameResponse.put("Andorra");
-
-        /* {
-            "continent": "Europe",
-            "name": "Portugal",
-            "population": 10142964,
-            "cases": {
-              "oneMPop": 373830,
-              "total": 3791744,
-              "newCases": -1,
-              "activeCases": -1,
-              "criticalCases": 61,
-              "recovered": -1
-            },
-            "deaths": {
-              "oneMPop": 2185,
-              "total": 3791744,
-              "newDeaths": -1
-            },
-            "tests": {
-              "oneMPop": 4046001,
-              "total": 3791744
-            },
-            "day": "2022-04-25",
-            "time": "2022-04-25T18:15:04+00:00"
-          } */
     }
 
     @Test
@@ -348,4 +323,28 @@ class CovidServiceTest {
 
     }
 
+    /* {
+            "continent": "Europe",
+            "name": "Portugal",
+            "population": 10142964,
+            "cases": {
+              "oneMPop": 373830,
+              "total": 3791744,
+              "newCases": -1,
+              "activeCases": -1,
+              "criticalCases": 61,
+              "recovered": -1
+            },
+            "deaths": {
+              "oneMPop": 2185,
+              "total": 3791744,
+              "newDeaths": -1
+            },
+            "tests": {
+              "oneMPop": 4046001,
+              "total": 3791744
+            },
+            "day": "2022-04-25",
+            "time": "2022-04-25T18:15:04+00:00"
+          } */
 }
