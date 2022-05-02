@@ -1,17 +1,17 @@
 package covidtracker.covidtracker.selenium;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
+
+import java.time.Duration;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.startsWith;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.time.Duration;
 
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.And;
