@@ -8,30 +8,11 @@ on:
     branches: [ main ]
     paths:
     - 'HW1/**'
+    - '.github/workflows'
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  react:
-    name: React
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x, 16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: (cd HW1/frontend/covid-tracker && npm ci) 
-    - run: (cd HW1/frontend/covid-tracker && npm run build --if-present)
-    - run: (cd HW1/frontend/covid-tracker && npm test --prefix HW1/frontend/covid-tracker)
-
   sonar:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
