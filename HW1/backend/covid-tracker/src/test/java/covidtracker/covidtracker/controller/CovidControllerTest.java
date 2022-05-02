@@ -82,11 +82,6 @@ class CovidControllerTest {
         mvc.perform(
             get("/api/v1/stats/{country}", stats.getName()).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            // Isto era se estivessemos a testar o serviço
-            //.andExpect(jsonPath("$response", hasSize(1)))
-            //.andExpect(jsonPath("$results", is(1)))
-            //.andExpect(jsonPath("$parameters.country", is(country)))
-            //.andExpect(jsonPath("$response[0].continent", is(stats.getContinent())))
             .andExpect(jsonPath("$[0].continent", is(stats.getContinent())))
             .andExpect(jsonPath("$[0].name", is(stats.getName())))
             .andExpect(jsonPath("$[0].population", is(stats.getPopulation())))

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import covidtracker.covidtracker.model.CountryStats;
 import covidtracker.covidtracker.service.CovidService;
+import io.swagger.v3.oas.annotations.Operation;
 
 /**
  * CovidSController
@@ -32,6 +33,7 @@ public class CovidController {
     @Autowired
     private CovidService covidService;
 
+    @Operation(summary = "Get current COVID-19 statistics from all countries available or from just one country")
     @GetMapping(value = {"/stats", "/stats/{country}"})
     public ResponseEntity<List<CountryStats>> getStats(@PathVariable("country") Optional<String> country) {
         logger.log(Level.INFO, "Statistics");
@@ -46,6 +48,7 @@ public class CovidController {
         return result.isPresent() ? ResponseEntity.ok(result.get()) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Get history of COVID-19 statistics from a country in a specific day or since there are data")
     @GetMapping("/history/{country}")
     public ResponseEntity<List<CountryStats>> getHistoryByCountry(@PathVariable("country") String country, @RequestParam Optional<String> date) {
         logger.log(Level.INFO, "History");
@@ -74,6 +77,7 @@ public class CovidController {
         return ResponseEntity.ok(result);
     }
 
+    @Operation(summary = "Get all countries with COVID-19 information available")
     @GetMapping("/countries")
     public ResponseEntity<List<String>> getAllCountries() {
         logger.log(Level.INFO, "Countries");
@@ -83,6 +87,7 @@ public class CovidController {
         return result.isPresent() ? ResponseEntity.ok(result.get()) : new ResponseEntity<>(Collections.emptyList(),HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Get cache details")
     @GetMapping("/cache/details")
     public ResponseEntity<Map<String, Object>> getCacheDetails() {
         logger.log(Level.INFO, "Cache Details");
